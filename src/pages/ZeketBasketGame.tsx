@@ -216,7 +216,7 @@ export function ZeketBasketGame() {
     const pct = Math.round((finalCorrect / totalCards) * 100)
     const byType = (['receiver', 'wealth', 'neither'] as CardType[]).map((type) => {
       const typeCards = shuffledCards.filter((c) => c.type === type)
-      const typeCorrect = typeCards.filter((c, idx) => {
+      const typeCorrect = typeCards.filter((c) => {
         const globalIdx = shuffledCards.indexOf(c)
         return results[globalIdx] ?? false
       }).length
