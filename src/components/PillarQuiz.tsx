@@ -198,38 +198,68 @@ export function PillarQuiz({ questions, title, backLink, backLabel }: PillarQuiz
           <span className="text-xs text-gray-400">Ұпай: {score}</span>
         </div>
         <h2 className="text-lg font-semibold text-gray-900 mb-5">{question.question}</h2>
-        <div className="flex flex-col gap-2">
-          {question.options.map((opt, idx) => {
-            let style = 'border-gray-200 bg-white hover:border-primary-400 hover:bg-primary-50'
-            if (gameState === 'answered') {
-              if (idx === question.correctIndex) style = 'border-green-400 bg-green-50'
-              else if (idx === selected && selected !== question.correctIndex)
-                style = 'border-red-400 bg-red-50'
-              else style = 'border-gray-200 bg-white opacity-60'
-            }
-            return (
-              <button
-                key={idx}
-                onClick={() => handleAnswer(idx)}
-                disabled={gameState === 'answered'}
-                className={`flex items-center gap-3 p-3 rounded-xl border-2 text-left transition-all duration-150 ${style} disabled:cursor-default`}
-              >
-                <span
-                  className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 ${
-                    gameState === 'answered' && idx === question.correctIndex
-                      ? 'bg-green-500 text-white'
-                      : gameState === 'answered' && idx === selected
-                      ? 'bg-red-400 text-white'
-                      : 'bg-gray-100 text-gray-500'
-                  }`}
+        {question.options.length === 2 ? (
+          <div className="grid grid-cols-2 gap-3">
+            {question.options.map((opt, idx) => {
+              const isGreen = idx === 0
+              let style: string
+              if (gameState === 'answered') {
+                if (idx === question.correctIndex)
+                  style = 'border-green-400 bg-green-500 text-white'
+                else if (idx === selected && selected !== question.correctIndex)
+                  style = 'border-red-400 bg-red-400 text-white'
+                else style = 'border-gray-200 bg-white opacity-60 text-gray-700'
+              } else {
+                style = isGreen
+                  ? 'border-green-300 bg-green-50 hover:bg-green-500 hover:text-white text-green-800'
+                  : 'border-red-300 bg-red-50 hover:bg-red-400 hover:text-white text-red-700'
+              }
+              return (
+                <button
+                  key={idx}
+                  onClick={() => handleAnswer(idx)}
+                  disabled={gameState === 'answered'}
+                  className={`py-4 rounded-xl border-2 font-bold text-base transition-all duration-150 ${style} disabled:cursor-default`}
                 >
-                  {String.fromCharCode(65 + idx)}
-                </span>
-                <span className="text-sm text-gray-800">{opt}</span>
-              </button>
-            )
-          })}
-        </div>
+                  {opt}
+                </button>
+              )
+            })}
+          </div>
+        ) : (
+          <div className="flex flex-col gap-2">
+            {question.options.map((opt, idx) => {
+              let style = 'border-gray-200 bg-white hover:border-primary-400 hover:bg-primary-50'
+              if (gameState === 'answered') {
+                if (idx === question.correctIndex) style = 'border-green-400 bg-green-50'
+                else if (idx === selected && selected !== question.correctIndex)
+                  style = 'border-red-400 bg-red-50'
+                else style = 'border-gray-200 bg-white opacity-60'
+              }
+              return (
+                <button
+                  key={idx}
+                  onClick={() => handleAnswer(idx)}
+                  disabled={gameState === 'answered'}
+                  className={`flex items-center gap-3 p-3 rounded-xl border-2 text-left transition-all duration-150 ${style} disabled:cursor-default`}
+                >
+                  <span
+                    className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 ${
+                      gameState === 'answered' && idx === question.correctIndex
+                        ? 'bg-green-500 text-white'
+                        : gameState === 'answered' && idx === selected
+                        ? 'bg-red-400 text-white'
+                        : 'bg-gray-100 text-gray-500'
+                    }`}
+                  >
+                    {String.fromCharCode(65 + idx)}
+                  </span>
+                  <span className="text-sm text-gray-800">{opt}</span>
+                </button>
+              )
+            })}
+          </div>
+        )}
         {gameState === 'answered' && (
           <div className="mt-4 bg-primary-50 border border-primary-100 rounded-xl p-3">
             <p className="text-sm text-primary-800">{question.explanation}</p>

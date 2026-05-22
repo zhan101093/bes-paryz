@@ -186,18 +186,26 @@ export function ZeketBasketGame() {
       const newStreak = streak + 1
       setStreak(newStreak)
       if (newStreak % 3 === 0) setHearts((h) => Math.min(h + 1, 5))
+      setTimeout(() => {
+        setFeedback(null)
+        if (currentIdx >= totalCards - 1) {
+          setGameState('result')
+        } else {
+          setCurrentIdx((i) => i + 1)
+        }
+      }, 1400)
     } else {
       setStreak(0)
     }
+  }
 
-    setTimeout(() => {
-      setFeedback(null)
-      if (currentIdx >= totalCards - 1) {
-        setGameState('result')
-      } else {
-        setCurrentIdx((i) => i + 1)
-      }
-    }, 1400)
+  function handleNext() {
+    setFeedback(null)
+    if (currentIdx >= totalCards - 1) {
+      setGameState('result')
+    } else {
+      setCurrentIdx((i) => i + 1)
+    }
   }
 
   function restart() {
@@ -377,6 +385,14 @@ export function ZeketBasketGame() {
                 </p>
               )}
               <p className="text-sm text-gray-600">{feedback.hint}</p>
+              {!feedback.correct && (
+                <button
+                  onClick={handleNext}
+                  className="mt-3 w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2 rounded-xl transition-colors"
+                >
+                  Келесі →
+                </button>
+              )}
             </div>
           )}
         </div>

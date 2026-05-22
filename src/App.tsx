@@ -1,5 +1,14 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
+import { useEffect } from 'react'
 import { Navbar } from './components/Layout'
+
+function ScrollToTop() {
+  const { pathname } = useLocation()
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [pathname])
+  return null
+}
 import { Home } from './pages/Home'
 import { NamazHub } from './pages/NamazHub'
 import { Tauhid } from './pages/Tauhid'
@@ -7,6 +16,8 @@ import { TauhidWhy } from './pages/TauhidWhy'
 import { TauhidLearn } from './pages/TauhidLearn'
 import { TauhidQuiz } from './pages/TauhidQuiz'
 import { TauhidOrderGame } from './pages/TauhidOrderGame'
+import { TauhidQuiz2 } from './pages/TauhidQuiz2'
+import { TauhidScenarioGame } from './pages/TauhidScenarioGame'
 import { Oraza } from './pages/Oraza'
 import { OrazaWhy } from './pages/OrazaWhy'
 import { OrazaLearn } from './pages/OrazaLearn'
@@ -41,6 +52,7 @@ import { ImageMatchGame } from './pages/ImageMatchGame'
 function App() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <div className="min-h-screen bg-gray-50">
         <Navbar />
         <Routes>
@@ -52,6 +64,8 @@ function App() {
           <Route path="/tauhid-learn" element={<TauhidLearn />} />
           <Route path="/tauhid-quiz" element={<TauhidQuiz />} />
           <Route path="/tauhid-order-game" element={<TauhidOrderGame />} />
+          <Route path="/tauhid-quiz2" element={<TauhidQuiz2 />} />
+          <Route path="/tauhid-scenario-game" element={<TauhidScenarioGame />} />
 
           {/* Намаз */}
           <Route path="/namaz" element={<NamazHub />} />

@@ -20,8 +20,8 @@ const sections = [
   {
     to: '/tauhid-quiz',
     number: '03',
-    title: 'Рас па, жалған ба? — Викторина',
-    description: 'Шаhадат туралы 10 сұрақ — білімді тексер',
+    title: 'Рас па, жалған ба?',
+    description: '10 рас/жалған сұрақ — жылдам білім тексеру',
     icon: '✅',
     color: 'from-purple-500 to-indigo-600',
   },
@@ -32,6 +32,22 @@ const sections = [
     description: 'Шаhадат сөздерін дұрыс ретімен орналастыр',
     icon: '🧩',
     color: 'from-rose-500 to-pink-600',
+  },
+  {
+    to: '/tauhid-quiz2',
+    number: '05',
+    title: 'Орта деңгей викторина',
+    description: '10 сұрақ, 4 вариант — терең білімді тексер',
+    icon: '🎯',
+    color: 'from-blue-500 to-indigo-600',
+  },
+  {
+    to: '/tauhid-scenario-game',
+    number: '06',
+    title: 'Өмірлік жағдайлар',
+    description: 'Шаhадат негізінде дұрыс шешім қабылда',
+    icon: '🎮',
+    color: 'from-teal-500 to-emerald-600',
   },
 ]
 
@@ -47,7 +63,7 @@ export function Tauhid() {
 
       <section className="text-center py-8 mb-8">
         <div className="inline-flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-full px-4 py-1.5 mb-4">
-          <span className="text-amber-600">☝️</span>
+          <span className="text-amber-600">🤍</span>
           <span className="text-amber-700 text-sm font-medium">Бес парыздың 1-ші тірегі</span>
         </div>
         <h1 className="text-3xl md:text-4xl font-bold text-primary-900 mb-3">Шаhадат үйрену</h1>
@@ -58,14 +74,16 @@ export function Tauhid() {
           </p>
         </div>
         <div className="mt-6 inline-block bg-amber-50 border border-amber-200 rounded-2xl px-6 py-3">
-          <p className="text-amber-800 font-arabic text-xl">أَشْهَدُ أَنْ لَا إِلَٰهَ إِلَّا اللَّهُ</p>
-          <p className="text-amber-600 text-sm mt-1">«Аллаhтан басқа Тәңір жоқ екеніне куәлік беремін» — Шаhадат</p>
+          <p className="font-arabic text-xl text-amber-800 leading-loose" dir="rtl">
+            أَشْهَدُ أَنْ لَا إِلَٰهَ إِلَّا اللَّهُ وَأَشْهَدُ أَنَّ مُحَمَّدًا رَسُولُ اللَّهِ
+          </p>
+          <p className="text-amber-600 text-sm mt-1">«Аллаhтан басқа Тәңір жоқ, Мұхаммад ﷺ Оның елшісі» — Шаhадат</p>
         </div>
       </section>
 
       <section>
         <h2 className="text-xl font-semibold text-gray-700 mb-4">Бөлімдер</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {sections.map((sec) => (
             <Link
               key={sec.to}

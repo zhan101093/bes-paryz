@@ -6,7 +6,7 @@ const pillars = [
     arabic: 'الشَّهَادَة',
     title: 'Шаhадат',
     subtitle: 'Аллаhтың бірлігіне куәлік беру',
-    icon: '☝️',
+    icon: '🤍',
     gradient: 'from-amber-400 to-yellow-500',
     bg: 'bg-amber-50',
     border: 'border-amber-300',

@@ -141,14 +141,6 @@ export function TauhidOrderGame() {
           <p className="text-sm text-gray-500">Шаhадат сөздерін дұрыс ретімен орналастыр</p>
         </div>
 
-        {/* Full kalima reference */}
-        <div className="bg-amber-50 border border-amber-200 rounded-2xl px-4 py-3 mb-4 text-center">
-          <p className="font-arabic text-base text-amber-800 leading-loose" dir="rtl">
-            أَشْهَدُ أَنْ لَا إِلَٰهَ إِلَّا اللَّهُ وَأَشْهَدُ أَنَّ مُحَمَّدًا رَسُولُ اللَّهِ
-          </p>
-          <p className="text-xs text-amber-600 mt-1">— жоғарыдағы сөздерді ретімен орналастыр</p>
-        </div>
-
         {/* Sequence area */}
         <div className="bg-white border-2 border-dashed border-amber-300 rounded-2xl p-4 mb-4 min-h-20">
           <p className="text-xs text-gray-400 mb-3 font-medium uppercase tracking-wider text-center">

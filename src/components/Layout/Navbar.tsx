@@ -2,7 +2,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { useState } from 'react'
 
 const navLinks = [
-  { to: '/tauhid', label: 'Шаhадат', icon: '☝️' },
+  { to: '/tauhid', label: 'Шаhадат', icon: '🤍' },
   { to: '/namaz', label: 'Намаз', icon: '🕌' },
   { to: '/oraza', label: 'Ораза', icon: '🌙' },
   { to: '/zeket', label: 'Зекет', icon: '💝' },
