@@ -34,7 +34,7 @@ export function Practice() {
 
   if (done) {
     return (
-      <main className="max-w-3xl mx-auto px-4 py-8">
+      <main translate="no" className="max-w-3xl mx-auto px-4 py-8">
         <div className="card text-center py-12">
           <div className="text-6xl mb-4">🤲</div>
           <h2 className="text-2xl font-bold text-primary-900 mb-2">МашаАллаh!</h2>
@@ -63,7 +63,7 @@ export function Practice() {
   }
 
   return (
-    <main className="max-w-3xl mx-auto px-4 py-8">
+    <main translate="no" className="max-w-3xl mx-auto px-4 py-8">
       <div className="mb-6">
         <Link to="/" className="text-sm text-primary-600 hover:underline">
           ← Басты бет

@@ -6,7 +6,7 @@ export function Mistakes() {
   const [expanded, setExpanded] = useState<number | null>(null)
 
   return (
-    <main className="max-w-3xl mx-auto px-4 py-8">
+    <main translate="no" className="max-w-3xl mx-auto px-4 py-8">
       <div className="mb-6">
         <Link to="/" className="text-sm text-primary-600 hover:underline">
           ← Басты бет

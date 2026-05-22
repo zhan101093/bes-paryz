@@ -3,18 +3,17 @@ import { Link } from 'react-router-dom'
 
 interface Pair {
   id: number
-  left: string
-  right: string
+  name: string
   image: string
 }
 
 const pairs: Pair[] = [
-  { id: 1, left: 'Тәкбір', right: 'Аллаhу Акбар', image: '/images/takbir.png' },
-  { id: 2, left: 'Руку', right: 'Субхана Раббиял-Азым', image: '/images/ruku.png' },
-  { id: 3, left: 'Рукудан тұру', right: 'Самиаллаhу лиман хамидаh', image: '/images/niet.png' },
-  { id: 4, left: 'Сәжде', right: 'Субхана Раббиял-Аъля', image: '/images/sajda.png' },
-  { id: 5, left: 'Екі сәжде арасы', right: 'Раббиғфир ли', image: '/images/tashahud-legs.png' },
-  { id: 6, left: 'Сәлем', right: 'Ас-саламу алейкум', image: '/images/salam-right.png' },
+  { id: 1, name: 'Тәкбір', image: '/images/takbir.png' },
+  { id: 2, name: 'Қиям', image: '/images/qyam-qyraat.png' },
+  { id: 3, name: 'Руку', image: '/images/ruku.png' },
+  { id: 4, name: 'Сәжде', image: '/images/sajda.png' },
+  { id: 5, name: 'Ташаhуд', image: '/images/tashahud.png' },
+  { id: 6, name: 'Сәлем', image: '/images/salam-right.png' },
 ]
 
 const COLORS = ['#6366f1', '#f59e0b', '#22c55e', '#ef4444', '#3b82f6', '#ec4899']
@@ -37,8 +36,10 @@ interface LineData {
   color: string
 }
 
-export function MatchGame() {
-  const [shuffledRight, setShuffledRight] = useState<number[]>(() => shuffle(pairs.map((p) => p.id)))
+export function ImageMatchGame() {
+  const [shuffledRight, setShuffledRight] = useState<number[]>(() =>
+    shuffle(pairs.map((p) => p.id))
+  )
   const [connections, setConnections] = useState<Map<number, number>>(new Map())
   const [selectedLeft, setSelectedLeft] = useState<number | null>(null)
   const [checked, setChecked] = useState(false)
@@ -107,38 +108,34 @@ export function MatchGame() {
 
   const correctCount = [...connections.entries()].filter(([lId, rId]) => lId === rId).length
   const allConnected = connections.size === pairs.length
-  const selectedPair = pairs.find((p) => p.id === selectedLeft)
 
   return (
     <main translate="no" className="max-w-2xl mx-auto px-4 py-8">
       <div className="mb-6">
-        <Link to="/" className="text-sm text-primary-600 hover:underline">
-          ← Басты бет
+        <Link to="/namaz" className="text-sm text-primary-600 hover:underline">
+          ← Намаз
         </Link>
         <h1 className="text-2xl md:text-3xl font-bold text-primary-900 mt-2">
-          Ойын — Жұптастыру
+          Ойын — Сурет-атау жұптастыру
         </h1>
         <p className="text-gray-500 mt-1 text-sm">
-          Сол жақтан қимылды таңда, оң жақтан сәйкес дұғаны басып байланыстыр
+          Сол жақтан суретті таңда, оң жақтан оның атауын басып байланыстыр
         </p>
       </div>
 
-      {/* Hint bar */}
       <div
         className={`mb-4 rounded-xl px-4 py-2.5 text-sm text-center font-medium transition-all duration-200 ${
-          selectedPair
+          selectedLeft !== null
             ? 'bg-primary-50 border border-primary-200 text-primary-800'
             : 'bg-gray-50 border border-gray-200 text-gray-400'
         }`}
       >
-        {selectedPair
-          ? `«${selectedPair.left}» таңдалды — оң жақтан дұғаны баса байланыстыр`
-          : 'Сол жақтан қимылды таңдаудан бастаңыз'}
+        {selectedLeft !== null
+          ? 'Сурет таңдалды — оң жақтан атауын баса байланыстыр'
+          : 'Сол жақтан суретті таңдаудан бастаңыз'}
       </div>
 
-      {/* Game area */}
       <div ref={containerRef} className="relative">
-        {/* SVG lines */}
         <svg
           className="absolute inset-0 pointer-events-none"
           style={{ width: '100%', height: '100%', overflow: 'visible' }}
@@ -147,8 +144,8 @@ export function MatchGame() {
           <defs>
             {lines.map((l) => (
               <marker
-                key={`arrow-${l.leftId}`}
-                id={`dot-${l.leftId}`}
+                key={`dot-img-${l.leftId}`}
+                id={`dot-img-${l.leftId}`}
                 markerWidth="6"
                 markerHeight="6"
                 refX="3"
@@ -182,19 +179,18 @@ export function MatchGame() {
                 strokeWidth={2.5}
                 strokeLinecap="round"
                 opacity={0.85}
-                markerStart={`url(#dot-${l.leftId})`}
-                markerEnd={`url(#dot-${l.leftId})`}
+                markerStart={`url(#dot-img-${l.leftId})`}
+                markerEnd={`url(#dot-img-${l.leftId})`}
               />
             )
           })}
         </svg>
 
-        {/* Two columns */}
-        <div className="flex gap-8">
-          {/* Left: movements */}
-          <div className="flex-1 flex flex-col gap-2">
+        <div className="flex gap-6">
+          {/* Left: images */}
+          <div className="flex-1 flex flex-col gap-3">
             <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1 text-center">
-              Қимылдар
+              Суреттер
             </p>
             {pairs.map((pair) => {
               const isSelected = selectedLeft === pair.id
@@ -206,11 +202,14 @@ export function MatchGame() {
               return (
                 <button
                   key={pair.id}
-                  ref={(el) => { leftRefs.current[pair.id] = el }}
+                  ref={(el) => {
+                    leftRefs.current[pair.id] = el
+                  }}
                   onClick={() => handleLeftClick(pair.id)}
                   disabled={checked}
+                  aria-label={checked ? pair.name : `${pair.id}-сурет`}
                   className={[
-                    'flex items-center gap-2 rounded-xl border-2 px-2 py-1 w-full h-[72px] transition-all duration-150',
+                    'relative flex items-center justify-center rounded-xl border-2 w-full h-24 transition-all duration-150',
                     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400',
                     isSelected
                       ? 'border-primary-500 bg-primary-50 shadow-md scale-[1.02]'
@@ -221,26 +220,25 @@ export function MatchGame() {
                       : isConnected
                       ? 'border-gray-300 bg-white'
                       : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm',
-                  ]
-                    .filter(Boolean)
-                    .join(' ')}
+                  ].join(' ')}
                 >
                   <img
                     src={pair.image}
-                    alt={pair.left}
-                    className="w-10 h-10 object-contain flex-shrink-0 rounded-lg"
+                    alt={checked ? pair.name : ''}
+                    className="max-w-full max-h-full object-contain p-2"
                   />
-                  <span className="flex-1 text-xs font-medium text-gray-900 leading-tight text-left">
-                    {pair.left}
-                  </span>
                   {isConnected && !checked && (
                     <span
-                      className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                      className="absolute bottom-1.5 right-1.5 w-2.5 h-2.5 rounded-full"
                       style={{ backgroundColor: color }}
                     />
                   )}
                   {checked && (
-                    <span className={`text-base font-bold flex-shrink-0 ${isCorrect ? 'text-green-500' : 'text-red-400'}`}>
+                    <span
+                      className={`absolute top-1.5 right-1.5 text-base font-bold ${
+                        isCorrect ? 'text-green-500' : 'text-red-400'
+                      }`}
+                    >
                       {isCorrect ? '✓' : '✗'}
                     </span>
                   )}
@@ -249,10 +247,10 @@ export function MatchGame() {
             })}
           </div>
 
-          {/* Right: duas (shuffled) */}
-          <div className="flex-1 flex flex-col gap-2">
+          {/* Right: names (shuffled) */}
+          <div className="flex-1 flex flex-col gap-3">
             <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1 text-center">
-              Дұғалар
+              Атаулар
             </p>
             {shuffledRight.map((rightId) => {
               const pair = pairs.find((p) => p.id === rightId)!
@@ -266,11 +264,13 @@ export function MatchGame() {
               return (
                 <button
                   key={rightId}
-                  ref={(el) => { rightRefs.current[rightId] = el }}
+                  ref={(el) => {
+                    rightRefs.current[rightId] = el
+                  }}
                   onClick={() => handleRightClick(rightId)}
                   disabled={checked}
                   className={[
-                    'flex items-center justify-center rounded-xl border-2 px-2 py-1 w-full h-[72px] transition-all duration-150',
+                    'flex items-center justify-center gap-2 rounded-xl border-2 px-3 py-2 w-full h-24 transition-all duration-150',
                     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400',
                     isCorrect
                       ? 'border-green-400 bg-green-50'
@@ -281,21 +281,23 @@ export function MatchGame() {
                       : selectedLeft !== null
                       ? 'border-gray-200 bg-white hover:border-primary-300 hover:bg-primary-50 hover:shadow-sm'
                       : 'border-gray-200 bg-white',
-                  ]
-                    .filter(Boolean)
-                    .join(' ')}
+                  ].join(' ')}
                 >
                   {isConnected && !checked && (
                     <span
-                      className="w-2.5 h-2.5 rounded-full flex-shrink-0 mr-1.5"
+                      className="w-2.5 h-2.5 rounded-full flex-shrink-0"
                       style={{ backgroundColor: color }}
                     />
                   )}
-                  <span className="text-xs italic text-gray-700 leading-snug text-center">
-                    {pair.right}
+                  <span className="text-sm font-semibold text-gray-800 text-center leading-snug">
+                    {pair.name}
                   </span>
                   {checked && (
-                    <span className={`ml-auto text-base font-bold flex-shrink-0 ${isCorrect ? 'text-green-500' : 'text-red-400'}`}>
+                    <span
+                      className={`text-base font-bold flex-shrink-0 ${
+                        isCorrect ? 'text-green-500' : 'text-red-400'
+                      }`}
+                    >
                       {isCorrect ? '✓' : '✗'}
                     </span>
                   )}
@@ -306,7 +308,6 @@ export function MatchGame() {
         </div>
       </div>
 
-      {/* Bottom */}
       <div className="mt-6">
         {!checked ? (
           <button
@@ -328,17 +329,17 @@ export function MatchGame() {
             </p>
             <p className="text-gray-600 text-sm mb-5">
               {correctCount === pairs.length
-                ? 'МашаАллаh! Барлық жұпты дұрыс таптың!'
+                ? 'МашаАллаh! Барлық суретті дұрыс таптың!'
                 : correctCount >= 4
                 ? 'Жақсы! Қайта байқап 100% жеткіз.'
-                : 'Дұғаларды оқып қайта байқа!'}
+                : 'Қимылдарды оқып қайта байқа!'}
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <button onClick={handleRestart} className="btn-primary">
                 Қайтадан ойнау
               </button>
-              <Link to="/duas" className="btn-secondary">
-                Дұғаларды оқу →
+              <Link to="/movements" className="btn-secondary">
+                Қимылдарды оқу →
               </Link>
             </div>
           </div>

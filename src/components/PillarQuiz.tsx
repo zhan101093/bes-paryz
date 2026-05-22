@@ -1,13 +1,27 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
-import { quizQuestions } from '../data/quiz'
-import { ProgressBar } from '../components/ui/ProgressBar'
+import { ProgressBar } from './ui/ProgressBar'
+
+export interface PillarQuestion {
+  id: number
+  question: string
+  options: string[]
+  correctIndex: number
+  explanation: string
+}
+
+interface PillarQuizProps {
+  questions: PillarQuestion[]
+  title: string
+  backLink: string
+  backLabel: string
+}
 
 type GameState = 'intro' | 'playing' | 'answered' | 'result'
 
 const TIMER_SECONDS = 30
 
-export function Game() {
+export function PillarQuiz({ questions, title, backLink, backLabel }: PillarQuizProps) {
   const [gameState, setGameState] = useState<GameState>('intro')
   const [current, setCurrent] = useState(0)
   const [selected, setSelected] = useState<number | null>(null)
@@ -15,7 +29,7 @@ export function Game() {
   const [timeLeft, setTimeLeft] = useState(TIMER_SECONDS)
   const [answers, setAnswers] = useState<(number | null)[]>([])
 
-  const question = quizQuestions[current]
+  const question = questions[current]
 
   const handleTimeout = useCallback(() => {
     if (gameState !== 'playing') return
@@ -51,7 +65,7 @@ export function Game() {
   }
 
   function handleNext() {
-    if (current < quizQuestions.length - 1) {
+    if (current < questions.length - 1) {
       setCurrent((c) => c + 1)
       setSelected(null)
       setTimeLeft(TIMER_SECONDS)
@@ -61,7 +75,7 @@ export function Game() {
     }
   }
 
-  const scorePercent = Math.round((score / quizQuestions.length) * 100)
+  const scorePercent = Math.round((score / questions.length) * 100)
 
   function getResultEmoji() {
     if (scorePercent >= 80) return '🏆'
@@ -71,35 +85,31 @@ export function Game() {
   }
 
   function getResultMsg() {
-    if (scorePercent >= 80) return 'Керемет! Намаз туралы жақсы білесіз!'
+    if (scorePercent >= 80) return 'Керемет! Жақсы білесіз!'
     if (scorePercent >= 60) return 'Жақсы нәтиже! Тағы да қайталаңыз.'
     if (scorePercent >= 40) return 'Тырысыңыз, тағы оқып шығыңыз!'
     return 'Алдыңғы бөлімдерді тағы бір рет оқып шықсаңыз болар.'
   }
 
-  // Intro screen
   if (gameState === 'intro') {
     return (
       <main translate="no" className="max-w-3xl mx-auto px-4 py-8">
         <div className="mb-6">
-          <Link to="/" className="text-sm text-primary-600 hover:underline">
-            ← Басты бет
+          <Link to={backLink} className="text-sm text-primary-600 hover:underline">
+            ← {backLabel}
           </Link>
-          <h1 className="text-2xl md:text-3xl font-bold text-primary-900 mt-2">
-            6-бөлім: Ойын — Викторина
-          </h1>
+          <h1 className="text-2xl md:text-3xl font-bold text-primary-900 mt-2">{title}</h1>
         </div>
         <div className="card text-center py-10">
           <div className="text-6xl mb-4">🎮</div>
-          <h2 className="text-xl font-bold text-gray-900 mb-2">Намаз туралы викторина</h2>
+          <h2 className="text-xl font-bold text-gray-900 mb-2">Викторина</h2>
           <p className="text-gray-600 mb-6 max-w-sm mx-auto">
-            {quizQuestions.length} сұрақ. Әр сұраққа {TIMER_SECONDS} секунд беріледі.
-            Өз білімін тексер!
+            {questions.length} сұрақ. Әр сұраққа {TIMER_SECONDS} секунд беріледі. Өз білімін тексер!
           </p>
           <div className="flex flex-col gap-2 items-center text-sm text-gray-500 mb-6">
             <p>✅ Дұрыс жауап — 1 ұпай</p>
             <p>⏰ Уақыт бітсе — 0 ұпай</p>
-            <p>🏆 Максимум — {quizQuestions.length} ұпай</p>
+            <p>🏆 Максимум — {questions.length} ұпай</p>
           </div>
           <button onClick={startGame} className="btn-primary text-lg px-8 py-3">
             Бастау →
@@ -109,7 +119,6 @@ export function Game() {
     )
   }
 
-  // Result screen
   if (gameState === 'result') {
     return (
       <main translate="no" className="max-w-3xl mx-auto px-4 py-8">
@@ -117,24 +126,19 @@ export function Game() {
           <div className="text-6xl mb-3">{getResultEmoji()}</div>
           <h2 className="text-2xl font-bold text-gray-900 mb-1">Нәтиже</h2>
           <p className="text-4xl font-bold text-primary-700 mb-1">
-            {score} / {quizQuestions.length}
+            {score} / {questions.length}
           </p>
           <p className="text-gray-600 mb-6">{getResultMsg()}</p>
-
-          <ProgressBar current={score} total={quizQuestions.length} />
-
-          {/* Answer review */}
+          <ProgressBar current={score} total={questions.length} />
           <div className="mt-6 flex flex-col gap-2 text-left">
-            {quizQuestions.map((q, i) => {
+            {questions.map((q, i) => {
               const userAnswer = answers[i]
               const correct = userAnswer === q.correctIndex
               return (
                 <div
                   key={q.id}
                   className={`rounded-xl p-3 border text-sm ${
-                    correct
-                      ? 'bg-green-50 border-green-200'
-                      : 'bg-red-50 border-red-200'
+                    correct ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'
                   }`}
                 >
                   <div className="flex gap-2 items-start">
@@ -153,13 +157,12 @@ export function Game() {
               )
             })}
           </div>
-
           <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
             <button onClick={startGame} className="btn-primary">
               Қайта ойнау
             </button>
-            <Link to="/" className="btn-secondary">
-              Басты бетке
+            <Link to={backLink} className="btn-secondary">
+              {backLabel}
             </Link>
           </div>
         </div>
@@ -167,20 +170,16 @@ export function Game() {
     )
   }
 
-  // Playing / Answered
   return (
     <main translate="no" className="max-w-3xl mx-auto px-4 py-8">
       <div className="mb-4">
-        <Link to="/" className="text-sm text-primary-600 hover:underline">
-          ← Басты бет
+        <Link to={backLink} className="text-sm text-primary-600 hover:underline">
+          ← {backLabel}
         </Link>
-        <h1 className="text-2xl font-bold text-primary-900 mt-2">
-          6-бөлім: Ойын
-        </h1>
+        <h1 className="text-2xl font-bold text-primary-900 mt-2">{title}</h1>
       </div>
-
       <div className="flex items-center justify-between mb-3">
-        <ProgressBar current={current + 1} total={quizQuestions.length} label="Сұрақ" />
+        <ProgressBar current={current + 1} total={questions.length} label="Сұрақ" />
         <div
           className={`ml-4 flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg border-2 transition-colors ${
             timeLeft > 10
@@ -191,32 +190,23 @@ export function Game() {
           {timeLeft}
         </div>
       </div>
-
       <div className="card mt-2">
         <div className="flex items-center justify-between mb-4">
           <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
             {current + 1}-сұрақ
           </span>
-          <span className="text-xs text-gray-400">
-            Ұпай: {score}
-          </span>
+          <span className="text-xs text-gray-400">Ұпай: {score}</span>
         </div>
-
         <h2 className="text-lg font-semibold text-gray-900 mb-5">{question.question}</h2>
-
         <div className="flex flex-col gap-2">
           {question.options.map((opt, idx) => {
             let style = 'border-gray-200 bg-white hover:border-primary-400 hover:bg-primary-50'
             if (gameState === 'answered') {
-              if (idx === question.correctIndex) {
-                style = 'border-green-400 bg-green-50'
-              } else if (idx === selected && selected !== question.correctIndex) {
+              if (idx === question.correctIndex) style = 'border-green-400 bg-green-50'
+              else if (idx === selected && selected !== question.correctIndex)
                 style = 'border-red-400 bg-red-50'
-              } else {
-                style = 'border-gray-200 bg-white opacity-60'
-              }
+              else style = 'border-gray-200 bg-white opacity-60'
             }
-
             return (
               <button
                 key={idx}
@@ -240,17 +230,15 @@ export function Game() {
             )
           })}
         </div>
-
         {gameState === 'answered' && (
           <div className="mt-4 bg-primary-50 border border-primary-100 rounded-xl p-3">
             <p className="text-sm text-primary-800">{question.explanation}</p>
           </div>
         )}
-
         {gameState === 'answered' && (
           <div className="mt-4 text-right">
             <button onClick={handleNext} className="btn-primary">
-              {current < quizQuestions.length - 1 ? 'Келесі сұрақ →' : 'Нәтижені көру →'}
+              {current < questions.length - 1 ? 'Келесі сұрақ →' : 'Нәтижені көру →'}
             </button>
           </div>
         )}

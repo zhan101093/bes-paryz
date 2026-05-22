@@ -2,13 +2,11 @@ import { Link, useLocation } from 'react-router-dom'
 import { useState } from 'react'
 
 const navLinks = [
-  { to: '/', label: 'Басты бет' },
-  { to: '/why', label: '1. Не үшін?' },
-  { to: '/movements', label: '2. Қимылдар' },
-  { to: '/duas', label: '3. Дұғалар' },
-  { to: '/practice', label: '4. Практика' },
-  { to: '/mistakes', label: '5. Қателер' },
-  { to: '/game', label: '6. Ойын' },
+  { to: '/tauhid', label: 'Шаhадат', icon: '☝️' },
+  { to: '/namaz', label: 'Намаз', icon: '🕌' },
+  { to: '/oraza', label: 'Ораза', icon: '🌙' },
+  { to: '/zeket', label: 'Зекет', icon: '💝' },
+  { to: '/kazhylyk', label: 'Қажылық', icon: '🕋' },
 ]
 
 export function Navbar() {
@@ -20,28 +18,27 @@ export function Navbar() {
       <div className="max-w-5xl mx-auto px-4">
         <div className="flex items-center justify-between h-14">
           <Link to="/" className="flex items-center gap-2 font-bold text-lg">
-            <span className="text-gold-400">☪</span>
-            <span>Намаз</span>
+            <span className="text-gold-400 text-xl">☪</span>
+            <span>Бес Парыз</span>
           </Link>
 
-          {/* Desktop nav */}
           <div className="hidden md:flex items-center gap-1">
-            {navLinks.slice(1).map((link) => (
+            {navLinks.map((link) => (
               <Link
                 key={link.to}
                 to={link.to}
-                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-1 ${
                   location.pathname === link.to
                     ? 'bg-primary-600 text-white'
                     : 'text-primary-100 hover:bg-primary-700'
                 }`}
               >
-                {link.label}
+                <span>{link.icon}</span>
+                <span>{link.label}</span>
               </Link>
             ))}
           </div>
 
-          {/* Mobile burger */}
           <button
             className="md:hidden p-2 rounded-lg hover:bg-primary-700"
             onClick={() => setOpen(!open)}
@@ -53,21 +50,32 @@ export function Navbar() {
           </button>
         </div>
 
-        {/* Mobile menu */}
         {open && (
           <div className="md:hidden pb-3 flex flex-col gap-1">
+            <Link
+              to="/"
+              onClick={() => setOpen(false)}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                location.pathname === '/'
+                  ? 'bg-primary-600 text-white'
+                  : 'text-primary-100 hover:bg-primary-700'
+              }`}
+            >
+              🏠 Басты бет
+            </Link>
             {navLinks.map((link) => (
               <Link
                 key={link.to}
                 to={link.to}
                 onClick={() => setOpen(false)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${
                   location.pathname === link.to
                     ? 'bg-primary-600 text-white'
                     : 'text-primary-100 hover:bg-primary-700'
                 }`}
               >
-                {link.label}
+                <span>{link.icon}</span>
+                <span>{link.label}</span>
               </Link>
             ))}
           </div>
