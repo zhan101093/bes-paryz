@@ -216,9 +216,9 @@ export function KazhylykScenarioGame() {
               let btnClass =
                 'bg-white border-2 border-amber-200 text-gray-800 hover:border-amber-400 hover:bg-amber-50'
               if (showResult) {
-                if (option.correct) {
+                if (isSelected && option.correct) {
                   btnClass = 'bg-teal-50 border-2 border-teal-400 text-teal-800 font-bold'
-                } else if (isSelected) {
+                } else if (isSelected && !option.correct) {
                   btnClass = 'bg-red-50 border-2 border-red-400 text-red-700'
                 } else {
                   btnClass = 'bg-white border-2 border-gray-200 text-gray-400'
@@ -234,7 +234,7 @@ export function KazhylykScenarioGame() {
                 >
                   <span className="mr-2 text-gray-400">{String.fromCharCode(65 + idx)})</span>
                   {option.text}
-                  {showResult && option.correct && (
+                  {showResult && isSelected && option.correct && (
                     <span className="float-right">✅</span>
                   )}
                   {showResult && isSelected && !option.correct && (

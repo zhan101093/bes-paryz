@@ -14,7 +14,7 @@ const items: FastingItem[] = [
   { id: 2, text: 'Ұмытып су ішу', icon: '💧', breaks: false },
   { id: 3, text: 'Түкірік жұту', icon: '💦', breaks: false },
   { id: 4, text: 'Мисвак қолдану', icon: '🪥', breaks: false },
-  { id: 5, text: 'Емдік күш беретін ине', icon: '💉', breaks: true },
+  { id: 5, text: 'Укол салу', icon: '💉', breaks: false },
   { id: 6, text: 'Ауызды шаю (жұтып қоймаса)', icon: '🫧', breaks: false },
   { id: 7, text: 'Шылым шегу', icon: '🚬', breaks: true },
   { id: 8, text: 'Тісті жұлдыру (қанды жұтпаса)', icon: '🦷', breaks: false },

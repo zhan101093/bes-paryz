@@ -54,10 +54,10 @@ const cards: Card[] = [
   },
   {
     id: 7,
-    name: 'Емдік укол салу',
+    name: 'Укол салу',
     emoji: '💉',
-    inBasket: false,
-    hint: 'Емдік күш беретін укол (ине) оразаны бұзады.',
+    inBasket: true,
+    hint: 'Укол салу оразаны бұзбайды.',
   },
   {
     id: 8,
