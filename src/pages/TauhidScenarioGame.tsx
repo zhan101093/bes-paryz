@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useLang } from '../contexts/LanguageContext'
 
 interface Choice {
   label: string
@@ -16,7 +17,7 @@ interface Scenario {
   explanation: string
 }
 
-const scenarios: Scenario[] = [
+const scenariosKk: Scenario[] = [
   {
     id: 1,
     emoji: '🏠',
@@ -83,7 +84,60 @@ const scenarios: Scenario[] = [
   },
 ]
 
+const scenariosRu: Scenario[] = [
+  {
+    id: 1, emoji: '🏠', title: 'Амулет',
+    situation: 'Твоя подруга заболела. Её мама повесила ей амулет «от сглаза». Подруга предложила тебе тоже взять такой амулет.',
+    choices: [
+      { label: 'A', text: 'Взять — «всё равно вреда нет»' },
+      { label: 'B', text: 'Отказаться — «мне не нравится»' },
+      { label: 'C', text: 'Вежливо отказаться — сказать, что уповаю на Аллаха, прочитать Аятул-Курси' },
+      { label: 'D', text: 'Взять, но не носить' },
+    ],
+    correctIndex: 2,
+    explanation: 'Ношение амулетов близко к ширку — нужно уповать только на Аллаха. Правильный путь: вежливо отказаться и прочитать Аятул-Курси или последние аяты суры Бакара.',
+  },
+  {
+    id: 2, emoji: '💼', title: 'Колдун-предсказатель',
+    situation: 'Семья в трудной ситуации. Мама говорит, что нужно сходить к колдуну — «он всё исправит». Пойдёшь с ними?',
+    choices: [
+      { label: 'A', text: 'Пойти — не обижай маму' },
+      { label: 'B', text: 'Отказаться — предложить «молись Аллаху»' },
+      { label: 'C', text: 'Пойти, но не верить' },
+      { label: 'D', text: 'Не идти и молчать' },
+    ],
+    correctIndex: 1,
+    explanation: 'Поход к колдуну — харам. Пророк ﷺ сказал: «Тот, кто ходил к колдуну, намаз того не принимается 40 дней». Правильный путь: вежливо предупредить семью.',
+  },
+  {
+    id: 3, emoji: '📱', title: 'Бидъа-марафон',
+    situation: 'Друзья в WhatsApp запустили марафон: «Перешли 10 людям — Аллах исполнит желание, не перешлёшь — будет плохо».',
+    choices: [
+      { label: 'A', text: 'Переслать — «вдруг плохое случится»' },
+      { label: 'B', text: 'Не участвовать и объяснить друзьям, что это бидъа' },
+      { label: 'C', text: 'Переслать, но не верить' },
+      { label: 'D', text: 'Переслать и загадать желание' },
+    ],
+    correctIndex: 1,
+    explanation: 'Это — бидъа (нечто придуманное в религии). Милость Аллаха не зависит от числа пересланных сообщений. Правильный путь: не участвовать и вежливо объяснить друзьям.',
+  },
+  {
+    id: 4, emoji: '💛', title: 'Рия — чистота намерения',
+    situation: 'Ты прочитала намаз. Подруга спросила: «Как часто ты читаешь намаз?». Внутри появилась мысль: «Если скажу — она подумает, что я хорошая».',
+    choices: [
+      { label: 'A', text: 'Ответить с гордостью: «Да, я читаю намаз»' },
+      { label: 'B', text: 'Скромно ответить — «Альхамдулиллях» или «С помощью Аллаха»' },
+      { label: 'C', text: 'Похвастаться количеством ракаатов' },
+      { label: 'D', text: 'Сказать, что не читаешь — чтобы не хвалилась' },
+    ],
+    correctIndex: 1,
+    explanation: 'Рия — совершение поклонения ради показа людям. Это портит намерение. «С помощью Аллаха» — проявление искренности и благодарности. Лучшее дело — то, что совершено искренне.',
+  },
+]
+
 export function TauhidScenarioGame() {
+  const { lang } = useLang()
+  const scenarios = lang === 'ru' ? scenariosRu : scenariosKk
   const [current, setCurrent] = useState(0)
   const [selected, setSelected] = useState<number | null>(null)
   const [score, setScore] = useState(0)
@@ -183,8 +237,8 @@ export function TauhidScenarioGame() {
         </div>
 
         <div className="bg-white rounded-2xl px-5 py-4 shadow border border-amber-100 mb-4 text-center">
-          <h1 className="text-xl font-bold text-gray-900 mb-1">🎮 Өмірлік жағдайлар</h1>
-          <p className="text-sm text-gray-500">Шаhадат негізінде дұрыс шешім қабылда</p>
+          <h1 className="text-xl font-bold text-gray-900 mb-1">{lang === 'ru' ? '🎮 Жизненные ситуации' : '🎮 Өмірлік жағдайлар'}</h1>
+          <p className="text-sm text-gray-500">{lang === 'ru' ? 'Принимай правильные решения на основе шахады' : 'Шаhадат негізінде дұрыс шешім қабылда'}</p>
         </div>
 
         <div className="h-2.5 bg-gray-200 rounded-full overflow-hidden mb-4">

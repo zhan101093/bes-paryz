@@ -1,6 +1,44 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { ProgressBar } from './ui/ProgressBar'
+import { useLang } from '../contexts/LanguageContext'
+
+const ui = {
+  kk: {
+    quizTitle: 'Викторина',
+    quizDesc: (n: number, t: number) => `${n} сұрақ. Әр сұраққа ${t} секунд беріледі. Өз білімін тексер!`,
+    correct: 'Дұрыс жауап — 1 ұпай',
+    timeout: 'Уақыт бітсе — 0 ұпай',
+    max: (n: number) => `Максимум — ${n} ұпай`,
+    start: 'Бастау →',
+    result: 'Нәтиже',
+    score: (s: number, n: number) => `${s} / ${n}`,
+    correctAnswer: 'Дұрыс жауап:',
+    replay: 'Қайта ойнау',
+    questionLabel: (i: number) => `${i}-сұрақ`,
+    scoreLabel: 'Ұпай:',
+    next: 'Келесі сұрақ →',
+    finish: 'Нәтижені көру →',
+    msgs: ['Алдыңғы бөлімдерді тағы бір рет оқып шықсаңыз болар.', 'Тырысыңыз, тағы оқып шығыңыз!', 'Жақсы нәтиже! Тағы да қайталаңыз.', 'Керемет! Жақсы білесіз!'],
+  },
+  ru: {
+    quizTitle: 'Викторина',
+    quizDesc: (n: number, t: number) => `${n} вопросов. На каждый вопрос ${t} секунд. Проверь свои знания!`,
+    correct: 'Правильный ответ — 1 очко',
+    timeout: 'Время вышло — 0 очков',
+    max: (n: number) => `Максимум — ${n} очков`,
+    start: 'Начать →',
+    result: 'Результат',
+    score: (s: number, n: number) => `${s} / ${n}`,
+    correctAnswer: 'Правильный ответ:',
+    replay: 'Играть снова',
+    questionLabel: (i: number) => `Вопрос ${i}`,
+    scoreLabel: 'Очки:',
+    next: 'Следующий вопрос →',
+    finish: 'Посмотреть результат →',
+    msgs: ['Прочитайте предыдущие разделы ещё раз.', 'Старайтесь, читайте ещё!', 'Хороший результат! Повторите ещё раз.', 'Отлично! Хорошо знаешь!'],
+  },
+}
 
 export interface PillarQuestion {
   id: number
@@ -22,6 +60,8 @@ type GameState = 'intro' | 'playing' | 'answered' | 'result'
 const TIMER_SECONDS = 30
 
 export function PillarQuiz({ questions, title, backLink, backLabel }: PillarQuizProps) {
+  const { lang } = useLang()
+  const u = ui[lang]
   const [gameState, setGameState] = useState<GameState>('intro')
   const [current, setCurrent] = useState(0)
   const [selected, setSelected] = useState<number | null>(null)
@@ -85,10 +125,10 @@ export function PillarQuiz({ questions, title, backLink, backLabel }: PillarQuiz
   }
 
   function getResultMsg() {
-    if (scorePercent >= 80) return 'Керемет! Жақсы білесіз!'
-    if (scorePercent >= 60) return 'Жақсы нәтиже! Тағы да қайталаңыз.'
-    if (scorePercent >= 40) return 'Тырысыңыз, тағы оқып шығыңыз!'
-    return 'Алдыңғы бөлімдерді тағы бір рет оқып шықсаңыз болар.'
+    if (scorePercent >= 80) return u.msgs[3]
+    if (scorePercent >= 60) return u.msgs[2]
+    if (scorePercent >= 40) return u.msgs[1]
+    return u.msgs[0]
   }
 
   if (gameState === 'intro') {
@@ -102,17 +142,17 @@ export function PillarQuiz({ questions, title, backLink, backLabel }: PillarQuiz
         </div>
         <div className="card text-center py-10">
           <div className="text-6xl mb-4">🎮</div>
-          <h2 className="text-xl font-bold text-gray-900 mb-2">Викторина</h2>
+          <h2 className="text-xl font-bold text-gray-900 mb-2">{u.quizTitle}</h2>
           <p className="text-gray-600 mb-6 max-w-sm mx-auto">
-            {questions.length} сұрақ. Әр сұраққа {TIMER_SECONDS} секунд беріледі. Өз білімін тексер!
+            {u.quizDesc(questions.length, TIMER_SECONDS)}
           </p>
           <div className="flex flex-col gap-2 items-center text-sm text-gray-500 mb-6">
-            <p>✅ Дұрыс жауап — 1 ұпай</p>
-            <p>⏰ Уақыт бітсе — 0 ұпай</p>
-            <p>🏆 Максимум — {questions.length} ұпай</p>
+            <p>✅ {u.correct}</p>
+            <p>⏰ {u.timeout}</p>
+            <p>🏆 {u.max(questions.length)}</p>
           </div>
           <button onClick={startGame} className="btn-primary text-lg px-8 py-3">
-            Бастау →
+            {u.start}
           </button>
         </div>
       </main>
@@ -124,9 +164,9 @@ export function PillarQuiz({ questions, title, backLink, backLabel }: PillarQuiz
       <main translate="no" className="max-w-3xl mx-auto px-4 py-8">
         <div className="card text-center py-10">
           <div className="text-6xl mb-3">{getResultEmoji()}</div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-1">Нәтиже</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-1">{u.result}</h2>
           <p className="text-4xl font-bold text-primary-700 mb-1">
-            {score} / {questions.length}
+            {u.score(score, questions.length)}
           </p>
           <p className="text-gray-600 mb-6">{getResultMsg()}</p>
           <ProgressBar current={score} total={questions.length} />
@@ -147,7 +187,7 @@ export function PillarQuiz({ questions, title, backLink, backLabel }: PillarQuiz
                       <p className="font-medium text-gray-800">{q.question}</p>
                       {!correct && (
                         <p className="text-xs text-gray-500 mt-0.5">
-                          Дұрыс жауап: {q.options[q.correctIndex]}
+                          {u.correctAnswer} {q.options[q.correctIndex]}
                         </p>
                       )}
                       <p className="text-xs text-gray-500 mt-0.5 italic">{q.explanation}</p>
@@ -159,7 +199,7 @@ export function PillarQuiz({ questions, title, backLink, backLabel }: PillarQuiz
           </div>
           <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
             <button onClick={startGame} className="btn-primary">
-              Қайта ойнау
+              {u.replay}
             </button>
             <Link to={backLink} className="btn-secondary">
               {backLabel}
@@ -193,9 +233,9 @@ export function PillarQuiz({ questions, title, backLink, backLabel }: PillarQuiz
       <div className="card mt-2">
         <div className="flex items-center justify-between mb-4">
           <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
-            {current + 1}-сұрақ
+            {u.questionLabel(current + 1)}
           </span>
-          <span className="text-xs text-gray-400">Ұпай: {score}</span>
+          <span className="text-xs text-gray-400">{u.scoreLabel} {score}</span>
         </div>
         <h2 className="text-lg font-semibold text-gray-900 mb-5">{question.question}</h2>
         {question.options.length === 2 ? (
@@ -268,7 +308,7 @@ export function PillarQuiz({ questions, title, backLink, backLabel }: PillarQuiz
         {gameState === 'answered' && (
           <div className="mt-4 text-right">
             <button onClick={handleNext} className="btn-primary">
-              {current < questions.length - 1 ? 'Келесі сұрақ →' : 'Нәтижені көру →'}
+              {current < questions.length - 1 ? u.next : u.finish}
             </button>
           </div>
         )}

@@ -1,14 +1,7 @@
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
 import { useEffect } from 'react'
+import { LanguageProvider } from './contexts/LanguageContext'
 import { Navbar } from './components/Layout'
-
-function ScrollToTop() {
-  const { pathname } = useLocation()
-  useEffect(() => {
-    window.scrollTo(0, 0)
-  }, [pathname])
-  return null
-}
 import { Home } from './pages/Home'
 import { NamazHub } from './pages/NamazHub'
 import { Tauhid } from './pages/Tauhid'
@@ -49,16 +42,24 @@ import { OrderGame } from './pages/OrderGame'
 import { MatchGame } from './pages/MatchGame'
 import { ImageMatchGame } from './pages/ImageMatchGame'
 
-function App() {
+function ScrollToTop() {
+  const { pathname } = useLocation()
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [pathname])
+  return null
+}
+
+function AppContent() {
   return (
-    <BrowserRouter>
+    <LanguageProvider>
       <ScrollToTop />
       <div className="min-h-screen bg-gray-50">
         <Navbar />
         <Routes>
           <Route path="/" element={<Home />} />
 
-          {/* Таухид */}
+          {/* Шаhадат */}
           <Route path="/tauhid" element={<Tauhid />} />
           <Route path="/tauhid-why" element={<TauhidWhy />} />
           <Route path="/tauhid-learn" element={<TauhidLearn />} />
@@ -107,6 +108,14 @@ function App() {
           <Route path="/kazhylyk-scenario-game" element={<KazhylykScenarioGame />} />
         </Routes>
       </div>
+    </LanguageProvider>
+  )
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <AppContent />
     </BrowserRouter>
   )
 }

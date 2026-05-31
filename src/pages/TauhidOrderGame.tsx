@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useLang } from '../contexts/LanguageContext'
 
-const correctOrder = [
+const orderKk = [
   { id: 1, arabic: 'أَشْهَدُ', trans: 'Ашhаду', hint: 'Куәлік беремін' },
   { id: 2, arabic: 'أَن لَّا إِلَهَ', trans: 'Ан лā иляhа', hint: 'тәңір жоқ екеніне' },
   { id: 3, arabic: 'إِلَّا اللَّهُ', trans: 'Илля Аллāhу', hint: 'Аллаhтан басқа' },
@@ -10,7 +11,16 @@ const correctOrder = [
   { id: 6, arabic: 'رَسُولُ اللَّهِ', trans: 'Расулуллāh', hint: 'Аллаhтың елшісі' },
 ]
 
-type Step = (typeof correctOrder)[0]
+const orderRu = [
+  { id: 1, arabic: 'أَشْهَدُ', trans: 'Ашхаду', hint: 'Я свидетельствую' },
+  { id: 2, arabic: 'أَن لَّا إِلَهَ', trans: 'Ан лā иляха', hint: 'что нет бога' },
+  { id: 3, arabic: 'إِلَّا اللَّهُ', trans: 'Илля Аллāху', hint: 'кроме Аллаха' },
+  { id: 4, arabic: 'وَأَشْهَدُ', trans: 'Уа ашхаду', hint: 'и свидетельствую' },
+  { id: 5, arabic: 'أَنَّ مُحَمَّدًا', trans: 'Анна Мухаммадан', hint: 'что Мухаммад' },
+  { id: 6, arabic: 'رَسُولُ اللَّهِ', trans: 'Расулуллāх', hint: 'посланник Аллаха' },
+]
+
+type Step = (typeof orderKk)[0]
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr]
@@ -22,7 +32,9 @@ function shuffle<T>(arr: T[]): T[] {
 }
 
 export function TauhidOrderGame() {
-  const [pool, setPool] = useState<Step[]>(() => shuffle(correctOrder))
+  const { lang } = useLang()
+  const correctOrder = lang === 'ru' ? orderRu : orderKk
+  const [pool, setPool] = useState<Step[]>(() => shuffle(lang === 'ru' ? orderRu : orderKk))
   const [sequence, setSequence] = useState<Step[]>([])
   const [checked, setChecked] = useState(false)
   const [gameState, setGameState] = useState<'playing' | 'result'>('playing')
@@ -51,6 +63,19 @@ export function TauhidOrderGame() {
     setGameState('playing')
   }
 
+  const ui = {
+    back: lang === 'ru' ? '← Шахада' : '← Шаhадат',
+    title: lang === 'ru' ? '🧩 Расставь каляму по порядку' : '🧩 Калима ретімен қой',
+    subtitle: lang === 'ru' ? 'Расставь слова шахады в правильном порядке' : 'Шаhадат сөздерін дұрыс ретімен орналастыр',
+    yourOrder: lang === 'ru' ? 'Твой порядок' : 'Сенің реттілігің',
+    pickCard: lang === 'ru' ? 'Выбери карточку снизу' : 'Төменнен карточка тап',
+    check: lang === 'ru' ? '✅ ПРОВЕРИТЬ' : '✅ ТЕКСЕРУ',
+    replay: lang === 'ru' ? '🔁 ИГРАТЬ СНОВА' : '🔁 ҚАЙТА ОЙНАУ',
+    home: lang === 'ru' ? '🏠 НА ГЛАВНУЮ' : '🏠 БАСТЫ БЕТКЕ',
+    result: lang === 'ru' ? 'РЕЗУЛЬТАТ' : 'НӘТИЖЕ',
+    wordsCorrect: lang === 'ru' ? 'слов расставлено правильно' : 'сөз дұрыс орналастырылды',
+  }
+
   const correctCount = checked
     ? sequence.filter((item, i) => item.id === i + 1).length
     : 0
@@ -62,11 +87,11 @@ export function TauhidOrderGame() {
         <div className="max-w-md w-full">
           <div className="bg-white rounded-3xl shadow-xl border border-amber-200 px-6 py-8 text-center">
             <div className="text-5xl mb-3">{allCorrect ? '🏆' : '⭐'}</div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-1">НӘТИЖЕ</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-1">{ui.result}</h2>
             <p className="text-5xl font-bold text-amber-600 mb-2">
               {correctCount}/{correctOrder.length}
             </p>
-            <p className="text-gray-400 text-sm mb-5">сөз дұрыс орналастырылды</p>
+            <p className="text-gray-400 text-sm mb-5">{ui.wordsCorrect}</p>
 
             <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 mb-5 text-center">
               <p className="font-arabic text-base text-amber-800 leading-loose" dir="rtl">
@@ -106,13 +131,13 @@ export function TauhidOrderGame() {
                 onClick={restart}
                 className="w-full bg-gradient-to-r from-amber-500 to-yellow-500 text-white font-bold py-3 rounded-2xl shadow hover:shadow-lg transition-all hover:scale-105"
               >
-                🔁 ҚАЙТА ОЙНАУ
+                {ui.replay}
               </button>
               <Link
                 to="/tauhid"
                 className="w-full block bg-gray-50 border border-gray-200 text-gray-600 font-semibold py-3 rounded-2xl text-center hover:bg-gray-100 transition-colors"
               >
-                🏠 БАСТЫ БЕТКЕ
+                {ui.home}
               </Link>
             </div>
           </div>
@@ -129,7 +154,7 @@ export function TauhidOrderGame() {
             to="/tauhid"
             className="text-sm text-amber-700 hover:text-amber-900 transition-colors"
           >
-            ← Шаhадат
+            {ui.back}
           </Link>
           <span className="text-sm text-gray-500 font-medium">
             {sequence.length}/{correctOrder.length}
@@ -137,17 +162,17 @@ export function TauhidOrderGame() {
         </div>
 
         <div className="bg-white rounded-2xl px-5 py-4 shadow border border-amber-100 mb-4 text-center">
-          <h1 className="text-xl font-bold text-gray-900 mb-1">🧩 Калима ретімен қой</h1>
-          <p className="text-sm text-gray-500">Шаhадат сөздерін дұрыс ретімен орналастыр</p>
+          <h1 className="text-xl font-bold text-gray-900 mb-1">{ui.title}</h1>
+          <p className="text-sm text-gray-500">{ui.subtitle}</p>
         </div>
 
         {/* Sequence area */}
         <div className="bg-white border-2 border-dashed border-amber-300 rounded-2xl p-4 mb-4 min-h-20">
           <p className="text-xs text-gray-400 mb-3 font-medium uppercase tracking-wider text-center">
-            Сенің реттілігің
+            {ui.yourOrder}
           </p>
           {sequence.length === 0 ? (
-            <p className="text-center text-gray-400 text-sm py-1">Төменнен карточка тап</p>
+            <p className="text-center text-gray-400 text-sm py-1">{ui.pickCard}</p>
           ) : (
             <div className="flex flex-col gap-2">
               {sequence.map((item, i) => {
@@ -205,7 +230,7 @@ export function TauhidOrderGame() {
             onClick={check}
             className="w-full bg-gradient-to-r from-amber-500 to-yellow-500 text-white font-bold py-4 rounded-2xl shadow-md hover:shadow-lg transition-all hover:scale-105 active:scale-95"
           >
-            ✅ ТЕКСЕРУ
+            {ui.check}
           </button>
         )}
 
