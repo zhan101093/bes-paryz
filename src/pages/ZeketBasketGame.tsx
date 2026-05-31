@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useLang } from '../contexts/LanguageContext'
 
 type CardType = 'receiver' | 'wealth' | 'neither'
 
@@ -11,10 +12,16 @@ interface Card {
   hint: string
 }
 
-const TYPE_LABEL: Record<CardType, string> = {
+const TYPE_LABEL_KK: Record<CardType, string> = {
   receiver: '👤 Зекет алушы',
   wealth: '💰 Зекет берілетін байлық',
   neither: '🚫 Зекетке жатпайды',
+}
+
+const TYPE_LABEL_RU: Record<CardType, string> = {
+  receiver: '👤 Получатель закята',
+  wealth: '💰 Имущество для закята',
+  neither: '🚫 Не относится к закяту',
 }
 
 const TYPE_COLOR: Record<CardType, string> = {
@@ -23,7 +30,7 @@ const TYPE_COLOR: Record<CardType, string> = {
   neither: 'bg-red-50 border-red-300 text-red-700',
 }
 
-const cards: Card[] = [
+const cardsKk: Card[] = [
   {
     id: 1,
     name: 'Мұқтаж отбасы',
@@ -145,6 +152,26 @@ const cards: Card[] = [
   },
 ]
 
+const cardsRu: Card[] = [
+  { id: 1, name: 'Нуждающаяся семья', emoji: '👨‍👩‍👧', type: 'receiver', hint: 'Нуждающаяся семья — основной получатель закята.' },
+  { id: 2, name: 'Сирота', emoji: '👦', type: 'receiver', hint: 'Сироты входят в число получателей закята.' },
+  { id: 3, name: 'Человек в долгах', emoji: '😔', type: 'receiver', hint: 'Человек, не способный выплатить долг, может получить закят.' },
+  { id: 4, name: 'Путник без денег', emoji: '✈️', type: 'receiver', hint: 'Путнику, оставшемуся в дороге без средств, можно дать закят.' },
+  { id: 5, name: 'Сборщик закята', emoji: '📋', type: 'receiver', hint: 'Люди, занимающиеся сбором и распределением закята, тоже могут его получать.' },
+  { id: 6, name: 'Деньги (достигшие нисаба)', emoji: '💵', type: 'wealth', hint: 'С денег, достигших нисаба, платится 2,5% закята в год.' },
+  { id: 7, name: 'Золото', emoji: '🥇', type: 'wealth', hint: 'Золото — вид имущества, с которого платится закят (нисаб — 85 г).' },
+  { id: 8, name: 'Серебро', emoji: '🪙', type: 'wealth', hint: 'Серебро тоже входит в закятное имущество (нисаб — 595 г).' },
+  { id: 9, name: 'Овцы', emoji: '🐑', type: 'wealth', hint: 'С 40 овец платится 1 овца закята.' },
+  { id: 10, name: 'Коровы', emoji: '🐄', type: 'wealth', hint: 'С коров тоже платится закят — скотский закят.' },
+  { id: 11, name: 'Зерно, урожай', emoji: '🌾', type: 'wealth', hint: 'С урожая платится ушр (1/10 или 1/20).' },
+  { id: 12, name: 'Торговые товары', emoji: '🛒', type: 'wealth', hint: 'С товаров для торговли платится закят.' },
+  { id: 13, name: 'Очень богатый человек', emoji: '💼', type: 'neither', hint: 'Богатым людям, достигшим нисаба, закят не даётся.' },
+  { id: 14, name: 'Родители', emoji: '👴👵', type: 'neither', hint: 'Своим родителям закят не даётся — их содержание отдельная обязанность.' },
+  { id: 15, name: 'Единственный дом', emoji: '🏠', type: 'neither', hint: 'С единственного дома для проживания закят не платится.' },
+  { id: 16, name: 'Мебель и бытовые вещи', emoji: '🛏️', type: 'neither', hint: 'С вещей для личного пользования закят не платится.' },
+  { id: 17, name: 'Собственные дети', emoji: '👧', type: 'neither', hint: 'Своим детям закят не даётся — их содержание — обязанность родителей.' },
+]
+
 interface FeedbackState {
   correct: boolean
   hint: string
@@ -161,7 +188,10 @@ function shuffle<T>(arr: T[]): T[] {
 }
 
 export function ZeketBasketGame() {
-  const [shuffledCards] = useState(() => shuffle(cards))
+  const { lang } = useLang()
+  const cards = lang === 'ru' ? cardsRu : cardsKk
+  const TYPE_LABEL = lang === 'ru' ? TYPE_LABEL_RU : TYPE_LABEL_KK
+  const [shuffledCards] = useState(() => shuffle(lang === 'ru' ? cardsRu : cardsKk))
   const [currentIdx, setCurrentIdx] = useState(0)
   const [streak, setStreak] = useState(0)
   const [score, setScore] = useState(0)
@@ -236,7 +266,7 @@ export function ZeketBasketGame() {
         <div className="max-w-md w-full">
           <div className="bg-white rounded-3xl shadow-xl border border-green-200 px-6 py-8 text-center">
             <div className="text-5xl mb-3">🧺</div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-1">НӘТИЖЕ</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-1">{lang === 'ru' ? 'РЕЗУЛЬТАТ' : 'НӘТИЖЕ'}</h2>
             <p className="text-5xl font-bold text-green-600 mb-1">{score} XP</p>
             <p className="text-gray-400 text-sm mb-4">
               {finalCorrect}/{totalCards} дұрыс жауап
@@ -296,7 +326,7 @@ export function ZeketBasketGame() {
                 onClick={restart}
                 className="w-full bg-gradient-to-r from-lime-500 to-emerald-600 text-white font-bold py-3 rounded-2xl shadow hover:shadow-lg transition-all hover:scale-105"
               >
-                🔁 ҚАЙТА ОЙНАУ
+                {lang === 'ru' ? '🔁 ИГРАТЬ СНОВА' : '🔁 ҚАЙТА ОЙНАУ'}
               </button>
               <Link
                 to="/zeket"
@@ -318,7 +348,7 @@ export function ZeketBasketGame() {
       <div className="max-w-lg mx-auto">
         <div className="flex items-center justify-between mb-4">
           <Link to="/zeket" className="text-sm text-green-700 hover:text-green-900 transition-colors">
-            ← Зекет
+            {lang === 'ru' ? '← Закят' : '← Зекет'}
           </Link>
           <span className="text-sm text-gray-500 font-medium">
             {currentIdx + 1}/{totalCards}
@@ -326,8 +356,8 @@ export function ZeketBasketGame() {
         </div>
 
         <div className="bg-white rounded-2xl px-5 py-4 shadow border border-green-100 mb-4 text-center">
-          <h1 className="text-xl font-bold text-gray-900 mb-1">🧺 Зекет себеті</h1>
-          <p className="text-sm text-gray-500">Карточканы дұрыс санатқа жатқыз!</p>
+          <h1 className="text-xl font-bold text-gray-900 mb-1">{lang === 'ru' ? '🧺 Корзина закята' : '🧺 Зекет себеті'}</h1>
+          <p className="text-sm text-gray-500">{lang === 'ru' ? 'Отнеси карточку в правильную категорию!' : 'Карточканы дұрыс санатқа жатқыз!'}</p>
         </div>
 
         {/* Progress */}
@@ -404,19 +434,19 @@ export function ZeketBasketGame() {
               onClick={() => handleChoice('receiver')}
               className="w-full bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-4 rounded-2xl shadow-md hover:shadow-lg transition-all hover:scale-105 active:scale-95 text-base"
             >
-              👤 Зекет алушы
+              {lang === 'ru' ? '👤 Получатель закята' : '👤 Зекет алушы'}
             </button>
             <button
               onClick={() => handleChoice('wealth')}
               className="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-4 rounded-2xl shadow-md hover:shadow-lg transition-all hover:scale-105 active:scale-95 text-base"
             >
-              💰 Зекет берілетін байлық
+              {lang === 'ru' ? '💰 Имущество для закята' : '💰 Зекет берілетін байлық'}
             </button>
             <button
               onClick={() => handleChoice('neither')}
               className="w-full bg-red-400 hover:bg-red-500 text-white font-bold py-4 rounded-2xl shadow-md hover:shadow-lg transition-all hover:scale-105 active:scale-95 text-base"
             >
-              🚫 Зекетке жатпайды
+              {lang === 'ru' ? '🚫 Не относится' : '🚫 Зекетке жатпайды'}
             </button>
           </div>
         )}

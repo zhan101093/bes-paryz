@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useLang } from '../contexts/LanguageContext'
 
 interface Card {
   id: number
@@ -9,7 +10,7 @@ interface Card {
   hint: string
 }
 
-const cards: Card[] = [
+const cardsKk: Card[] = [
   {
     id: 1,
     name: 'Ұмытып ішіп-жеу',
@@ -138,6 +139,27 @@ const cards: Card[] = [
   },
 ]
 
+const cardsRu: Card[] = [
+  { id: 1, name: 'Случайно поесть/попить', emoji: '💧', inBasket: true, hint: 'Случайное употребление прощается. При воспоминании нужно остановиться.' },
+  { id: 2, name: 'Намеренно поесть/попить', emoji: '🍔', inBasket: false, hint: 'Намеренное употребление нарушает пост, нужно восполнить.' },
+  { id: 3, name: 'Глотать слюну', emoji: '💦', inBasket: true, hint: 'Глотание собственной слюны пост не нарушает.' },
+  { id: 4, name: 'Курить', emoji: '🚬', inBasket: false, hint: 'Курение нарушает пост.' },
+  { id: 5, name: 'Принять душ', emoji: '🚿', inBasket: true, hint: 'Душ и купание пост не нарушает (если вода не попала в нос).' },
+  { id: 6, name: 'Капли в глаза', emoji: '👁️', inBasket: true, hint: 'Глазные капли пост не нарушают — до желудка не доходят.' },
+  { id: 7, name: 'Укол салу', emoji: '💉', inBasket: true, hint: 'Укол салу оразаны бұзбайды.' },
+  { id: 8, name: 'Зубная паста', emoji: '🪥', inBasket: true, hint: 'Зубная паста пост не нарушает, если не глотать.' },
+  { id: 9, name: 'Намеренно вызвать рвоту', emoji: '🤢', inBasket: false, hint: 'Намеренная рвота нарушает пост.' },
+  { id: 10, name: 'Лечить зуб', emoji: '🦷', inBasket: true, hint: 'Удаление/лечение зуба пост не нарушает (если не глотать кровь/воду).' },
+  { id: 11, name: 'Сдать кровь', emoji: '🩺', inBasket: true, hint: 'Сдача крови для анализов пост не нарушает.' },
+  { id: 12, name: 'Чувствовать запах еды', emoji: '👃', inBasket: true, hint: 'Чувствовать запах или нюхать еду пост не нарушает.' },
+  { id: 13, name: 'Капли в нос', emoji: '💊', inBasket: false, hint: 'Капли в нос нарушают пост, если достигают желудка.' },
+  { id: 14, name: 'Маска кислорода', emoji: '😮', inBasket: true, hint: 'Маска кислорода в экстренной ситуации пост не нарушает.' },
+  { id: 15, name: 'Нанести крем', emoji: '🧴', inBasket: true, hint: 'Нанесение крема или мази на тело пост не нарушает.' },
+  { id: 16, name: 'Уснуть от усталости', emoji: '😴', inBasket: true, hint: 'Уснуть от усталости пост не нарушает.' },
+  { id: 17, name: 'Съесть застрявшую еду', emoji: '🌾', inBasket: false, hint: 'Намеренное съедание застрявшей между зубами еды нарушает пост.' },
+  { id: 18, name: 'Духи', emoji: '🌸', inBasket: true, hint: 'Использование духов пост не нарушает.' },
+]
+
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr]
   for (let i = a.length - 1; i > 0; i--) {
@@ -148,7 +170,9 @@ function shuffle<T>(arr: T[]): T[] {
 }
 
 export function OrazaOrderGame() {
-  const [shuffledCards] = useState(() => shuffle(cards))
+  const { lang } = useLang()
+  const cards = lang === 'ru' ? cardsRu : cardsKk
+  const [shuffledCards] = useState(() => shuffle(lang === 'ru' ? cardsRu : cardsKk))
   const [selected, setSelected] = useState<Set<number>>(new Set())
   const [checked, setChecked] = useState(false)
   const [gameState, setGameState] = useState<'playing' | 'result'>('playing')
@@ -279,8 +303,8 @@ export function OrazaOrderGame() {
         </div>
 
         <div className="bg-white rounded-2xl px-5 py-4 shadow border border-violet-100 mb-4 text-center">
-          <h1 className="text-xl font-bold text-gray-900 mb-1">🧺 Ораза себеті</h1>
-          <p className="text-sm text-gray-500">Оразаны бұзбайтын нәрселерді іріктеп себетке жина!</p>
+          <h1 className="text-xl font-bold text-gray-900 mb-1">{lang === 'ru' ? '🧺 Корзина поста' : '🧺 Ораза себеті'}</h1>
+          <p className="text-sm text-gray-500">{lang === 'ru' ? 'Выбери вещи, которые не нарушают пост!' : 'Оразаны бұзбайтын нәрселерді іріктеп себетке жина!'}</p>
         </div>
 
         {/* Rules */}

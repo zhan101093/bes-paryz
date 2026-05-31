@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
+import { useLang } from '../contexts/LanguageContext'
 
-const questions = [
+const questionsKk = [
   {
     id: 1,
     question: 'Зекеттің негізгі мақсаты қайсы?',
@@ -124,6 +125,19 @@ const questions = [
   },
 ]
 
+const questionsRu = [
+  { id: 1, question: 'Какова главная цель закята?', options: ['Повысить репутацию богатого', 'Выровнять разрыв между богатыми и бедными, очистить сердце', 'Только копить деньги', 'Раздавать на праздниках'], correctIndex: 1, explanation: 'Закят очищает сердце и сокращает неравенство в обществе.' },
+  { id: 2, question: 'Почему закят обязателен только для имущих?', options: ['Потому что они больше трудятся', 'Потому что им надо копить деньги', 'Потому что у них есть излишек, которым они могут помочь обществу', 'Потому что закят даётся только в Рамадан'], correctIndex: 2, explanation: 'Излишек богатства возвращается обществу — это принцип справедливости в исламе.' },
+  { id: 3, question: 'Что означает нисаб?', options: ['День выплаты закята', 'Список получателей закята', 'Минимальный размер имущества, при котором закят становится обязательным', 'Вид садаки'], correctIndex: 2, explanation: 'Нисаб — минимальный размер имущества, при котором закят становится обязательным.' },
+  { id: 4, question: 'Что происходит, если имущество меньше нисаба?', options: ['Всё равно обязан дать закят', 'Даёт садаку, но закят не обязателен', 'Берёт в долг', 'Ничего не происходит'], correctIndex: 1, explanation: 'Если ниже нисаба — закят не обязателен, но садаку давать можно.' },
+  { id: 5, question: 'Что из следующего не относится к объекту закята?', options: ['Деньги', 'Золото', 'Торговые товары', 'Одежда для личного пользования'], correctIndex: 3, explanation: 'Вещи для личного пользования не входят в расчёт закята.' },
+  { id: 6, question: 'Какое правило закята для овец?', options: ['10 овец = 1 овца закята', '40 овец = 1 овца закята', '100 овец = 10 овец', 'С овец закят не берётся'], correctIndex: 1, explanation: 'С 40 овец берётся 1 овца закята — основное правило закята со скота.' },
+  { id: 7, question: 'Какое намерение правильно для закята?', options: ['Чтобы люди хвалили', 'Чтобы выглядеть хорошо в обществе', 'Ради довольства Аллаха и очищения сердца', 'Чтобы избежать налогов'], correctIndex: 2, explanation: 'Намерение — основа всех поклонений. Закят нужно давать только ради Аллаха.' },
+  { id: 8, question: 'Какой главный этикет при выплате закята?', options: ['Говорить громко', 'Давать с обидой', 'Обязывать получателя', 'Давать скромно и с уважением'], correctIndex: 3, explanation: 'Давать закят скромно и с уважением — лучший этикет.' },
+  { id: 9, question: 'В каком из следующих случаев закят не даётся?', options: ['Должнику', 'Нуждающемуся', 'Очень богатому человеку (выше нисаба)', 'Сироте'], correctIndex: 2, explanation: 'Богатому закят не даётся — у него самого имущество выше нисаба, он сам обязан платить.' },
+  { id: 10, question: 'Что меняется в обществе при выплате закята?', options: ['Богатых становится больше', 'Баланс бедности и богатства улучшается, доброта растёт', 'Денег становится меньше', 'Ничего не меняется'], correctIndex: 1, explanation: 'Закят сокращает неравенство в обществе, растёт единство и доброта.' },
+]
+
 type GameState = 'start' | 'playing' | 'feedback' | 'result'
 
 interface RankInfo {
@@ -133,17 +147,24 @@ interface RankInfo {
   emoji: string
 }
 
-function getRank(score: number): RankInfo {
-  if (score >= 145)
-    return { label: 'Зекет шебері', emoji: '👑', color: 'text-yellow-700', bg: 'bg-yellow-50 border-yellow-300' }
-  if (score >= 80)
-    return { label: 'Ғалым', emoji: '🕌', color: 'text-emerald-700', bg: 'bg-emerald-50 border-emerald-300' }
-  if (score >= 50)
-    return { label: 'Оқушы', emoji: '📘', color: 'text-blue-700', bg: 'bg-blue-50 border-blue-300' }
+function getRankKk(score: number): RankInfo {
+  if (score >= 145) return { label: 'Зекет шебері', emoji: '👑', color: 'text-yellow-700', bg: 'bg-yellow-50 border-yellow-300' }
+  if (score >= 80) return { label: 'Ғалым', emoji: '🕌', color: 'text-emerald-700', bg: 'bg-emerald-50 border-emerald-300' }
+  if (score >= 50) return { label: 'Оқушы', emoji: '📘', color: 'text-blue-700', bg: 'bg-blue-50 border-blue-300' }
   return { label: 'Жаңадан бастаушы', emoji: '🌱', color: 'text-gray-600', bg: 'bg-gray-50 border-gray-300' }
 }
 
+function getRankRu(score: number): RankInfo {
+  if (score >= 145) return { label: 'Мастер закята', emoji: '👑', color: 'text-yellow-700', bg: 'bg-yellow-50 border-yellow-300' }
+  if (score >= 80) return { label: 'Знаток', emoji: '🕌', color: 'text-emerald-700', bg: 'bg-emerald-50 border-emerald-300' }
+  if (score >= 50) return { label: 'Ученик', emoji: '📘', color: 'text-blue-700', bg: 'bg-blue-50 border-blue-300' }
+  return { label: 'Начинающий', emoji: '🌱', color: 'text-gray-600', bg: 'bg-gray-50 border-gray-300' }
+}
+
 export function ZeketGame() {
+  const { lang } = useLang()
+  const questions = lang === 'ru' ? questionsRu : questionsKk
+  const getRank = lang === 'ru' ? getRankRu : getRankKk
   const [gameState, setGameState] = useState<GameState>('start')
   const [current, setCurrent] = useState(0)
   const [selected, setSelected] = useState<number | null>(null)
@@ -217,9 +238,9 @@ export function ZeketGame() {
 
   const streakBadge =
     streak >= 5
-      ? '🔥🔥🔥 Зекет шебері режимі!'
+      ? lang === 'ru' ? '🔥🔥🔥 Режим мастера закята!' : '🔥🔥🔥 Зекет шебері режимі!'
       : streak >= 3
-      ? '🔥🔥 Алаулап тұрсың!'
+      ? lang === 'ru' ? '🔥🔥 Ты в огне!' : '🔥🔥 Алаулап тұрсың!'
       : streak >= 1
       ? '🔥'
       : null
@@ -233,7 +254,7 @@ export function ZeketGame() {
             to="/zeket"
             className="inline-flex items-center gap-1 text-sm text-emerald-700 hover:text-emerald-900 mb-8 transition-colors"
           >
-            ← Зекет
+            {lang === 'ru' ? '← Закят' : '← Зекет'}
           </Link>
 
           <div className="relative bg-white rounded-3xl shadow-xl border border-amber-200 px-8 py-10 overflow-hidden">
@@ -256,22 +277,20 @@ export function ZeketGame() {
 
             <div className="relative">
               <div className="text-6xl mb-4">💰</div>
-              <h1 className="text-2xl font-bold text-amber-800 mb-1">ЗЕКЕТ ШЕБЕРІ</h1>
-              <p className="text-sm text-gray-500 mb-6">
-                Біліміңді тексер
-              </p>
+              <h1 className="text-2xl font-bold text-amber-800 mb-1">{lang === 'ru' ? 'МАСТЕР ЗАКЯТА' : 'ЗЕКЕТ ШЕБЕРІ'}</h1>
+              <p className="text-sm text-gray-500 mb-6">{lang === 'ru' ? 'Проверь свои знания' : 'Біліміңді тексер'}</p>
 
               <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-left mb-6 space-y-1.5 text-sm text-gray-600">
-                <p>🎯 10 сұрақ · 4 нұсқа</p>
-                <p>❤️ 3 өмір</p>
-                <p>⭐ Дұрыс жауап: +10 балл</p>
+                <p>🎯 {lang === 'ru' ? '10 вопросов · 4 варианта' : '10 сұрақ · 4 нұсқа'}</p>
+                <p>❤️ {lang === 'ru' ? '3 жизни' : '3 өмір'}</p>
+                <p>⭐ {lang === 'ru' ? 'Правильный ответ: +10 очков' : 'Дұрыс жауап: +10 балл'}</p>
               </div>
 
               <button
                 onClick={startGame}
                 className="w-full bg-gradient-to-r from-amber-500 to-emerald-600 text-white font-bold py-4 rounded-2xl text-lg shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 animate-pulse"
               >
-                ▶ БАСТАУ
+                {lang === 'ru' ? '▶ НАЧАТЬ' : '▶ БАСТАУ'}
               </button>
             </div>
           </div>
@@ -288,9 +307,9 @@ export function ZeketGame() {
         <div className="max-w-md w-full">
           <div className="bg-white rounded-3xl shadow-xl border border-amber-200 px-8 py-10 text-center">
             <div className="text-6xl mb-4 animate-bounce">🏆</div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-1">НӘТИЖЕ</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-1">{lang === 'ru' ? 'РЕЗУЛЬТАТ' : 'НӘТИЖЕ'}</h2>
             <p className="text-5xl font-bold text-amber-600 mb-1">{score}</p>
-            <p className="text-gray-400 text-xs mb-5">балл жиналды</p>
+            <p className="text-gray-400 text-xs mb-5">{lang === 'ru' ? 'очков набрано' : 'балл жиналды'}</p>
 
             <div className={`inline-flex items-center gap-2 rounded-2xl border px-6 py-3 mb-6 ${rank.bg}`}>
               <span className="text-2xl">{rank.emoji}</span>
@@ -300,7 +319,7 @@ export function ZeketGame() {
             <div className="grid grid-cols-3 gap-3 mb-6">
               <div className="bg-emerald-50 rounded-2xl p-3">
                 <p className="text-2xl font-bold text-emerald-700">{correctCount}</p>
-                <p className="text-xs text-gray-500">Дұрыс</p>
+                <p className="text-xs text-gray-500">{lang === 'ru' ? 'Верно' : 'Дұрыс'}</p>
               </div>
               <div className="bg-amber-50 rounded-2xl p-3">
                 <p className="text-2xl font-bold text-amber-700">{maxStreak}</p>
@@ -308,7 +327,7 @@ export function ZeketGame() {
               </div>
               <div className="bg-rose-50 rounded-2xl p-3">
                 <p className="text-2xl font-bold text-rose-700">{3 - lives}</p>
-                <p className="text-xs text-gray-500">Қате</p>
+                <p className="text-xs text-gray-500">{lang === 'ru' ? 'Ошибки' : 'Қате'}</p>
               </div>
             </div>
 
@@ -317,19 +336,19 @@ export function ZeketGame() {
                 onClick={startGame}
                 className="w-full bg-gradient-to-r from-amber-500 to-emerald-600 text-white font-bold py-3 rounded-2xl shadow hover:shadow-lg transition-all hover:scale-105"
               >
-                🔁 ҚАЙТА ОЙНАУ
+                {lang === 'ru' ? '🔁 ИГРАТЬ СНОВА' : '🔁 ҚАЙТА ОЙНАУ'}
               </button>
               <Link
                 to="/zeket-quiz"
                 className="w-full block bg-emerald-50 border border-emerald-200 text-emerald-800 font-semibold py-3 rounded-2xl text-center hover:bg-emerald-100 transition-colors"
               >
-                ➡ КЕЛЕСІ МОДУЛЬ
+                {lang === 'ru' ? '➡ СЛЕДУЮЩИЙ МОДУЛЬ' : '➡ КЕЛЕСІ МОДУЛЬ'}
               </Link>
               <Link
                 to="/zeket"
                 className="w-full block bg-gray-50 border border-gray-200 text-gray-600 font-semibold py-3 rounded-2xl text-center hover:bg-gray-100 transition-colors"
               >
-                🏠 БАСТЫ БЕТКЕ
+                {lang === 'ru' ? '🏠 НА ГЛАВНУЮ' : '🏠 БАСТЫ БЕТКЕ'}
               </Link>
             </div>
           </div>
@@ -346,7 +365,7 @@ export function ZeketGame() {
         {/* HUD */}
         <div className="flex items-center justify-between mb-4 bg-white rounded-2xl px-4 py-3 shadow border border-amber-100">
           <div className="text-center">
-            <p className="text-xs text-gray-400">Ұпай</p>
+            <p className="text-xs text-gray-400">{lang === 'ru' ? 'Очки' : 'Ұпай'}</p>
             <p className="text-base font-bold text-amber-600">⭐ {score}</p>
           </div>
           <div className="text-center">
@@ -354,11 +373,11 @@ export function ZeketGame() {
             <p className="text-base font-bold text-orange-500">🔥 {streak}</p>
           </div>
           <div className="text-center">
-            <p className="text-xs text-gray-400">Сұрақ</p>
+            <p className="text-xs text-gray-400">{lang === 'ru' ? 'Вопрос' : 'Сұрақ'}</p>
             <p className="text-base font-bold text-emerald-700">{current + 1}/10</p>
           </div>
           <div className="text-center">
-            <p className="text-xs text-gray-400">Өмір</p>
+            <p className="text-xs text-gray-400">{lang === 'ru' ? 'Жизни' : 'Өмір'}</p>
             <p className="text-base">
               {Array.from({ length: lives }).fill('❤️').join('')}
               {Array.from({ length: 3 - lives }).fill('🖤').join('')}
@@ -397,7 +416,7 @@ export function ZeketGame() {
           }`}
         >
           <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
-            {question.id}-сұрақ
+            {lang === 'ru' ? `Вопрос ${question.id}` : `${question.id}-сұрақ`}
           </span>
           <h2 className="text-base font-semibold text-gray-900 mt-2 mb-5">{question.question}</h2>
 
@@ -452,13 +471,13 @@ export function ZeketGame() {
                       isCorrect ? 'text-emerald-800' : 'text-red-700'
                     }`}
                   >
-                    {isCorrect ? 'ДҰРЫС!' : 'ҚАТЕ'}
+                    {isCorrect ? (lang === 'ru' ? 'ВЕРНО!' : 'ДҰРЫС!') : (lang === 'ru' ? 'НЕВЕРНО' : 'ҚАТЕ')}
                   </p>
                   {isCorrect ? (
                     <p className="text-xs text-emerald-700">+10 балл</p>
                   ) : (
                     <p className="text-xs text-red-600">
-                      Дұрыс жауап: {question.options[question.correctIndex]}
+                      {lang === 'ru' ? 'Правильный ответ:' : 'Дұрыс жауап:'} {question.options[question.correctIndex]}
                     </p>
                   )}
                   <p className="text-xs text-gray-500 mt-1">{question.explanation}</p>
@@ -469,7 +488,7 @@ export function ZeketGame() {
                 onClick={handleNext}
                 className="w-full bg-gradient-to-r from-amber-500 to-emerald-600 text-white font-bold py-2.5 rounded-xl text-sm shadow hover:shadow-md transition-all"
               >
-                {current < questions.length - 1 ? 'Келесі →' : 'Нәтижені көру →'}
+                {current < questions.length - 1 ? (lang === 'ru' ? 'Далее →' : 'Келесі →') : (lang === 'ru' ? 'Результат →' : 'Нәтижені көру →')}
               </button>
             </div>
           )}

@@ -1,28 +1,17 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  TouchSensor,
-  useSensor,
-  useSensors,
-  DragOverlay,
+  DndContext, closestCenter, KeyboardSensor, PointerSensor, TouchSensor,
+  useSensor, useSensors, DragOverlay,
 } from '@dnd-kit/core'
 import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core'
 import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  useSortable,
-  verticalListSortingStrategy,
+  arrayMove, SortableContext, sortableKeyboardCoordinates,
+  useSortable, verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { movements } from '../data/movements'
-
-const gameMovements = movements.filter((m) => m.id !== 6)
-const correctOrder = gameMovements.map((m) => m.id)
+import { movements, movementsRu } from '../data/movements'
+import { useLang } from '../contexts/LanguageContext'
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr]
@@ -30,75 +19,37 @@ function shuffle<T>(arr: T[]): T[] {
     const j = Math.floor(Math.random() * (i + 1))
     ;[a[i], a[j]] = [a[j], a[i]]
   }
-  if (a.every((v, i) => v === correctOrder[i])) return shuffle(arr)
+  if (a.every((v, i) => v === arr[i])) return shuffle(arr)
   return a
 }
 
 interface CardProps {
-  id: number
-  name: string
-  image: string
-  position: number
-  checked: boolean
-  isCorrect: boolean
-  isDragActive: boolean
+  id: number; name: string; image: string; position: number
+  checked: boolean; isCorrect: boolean; isDragActive: boolean
 }
 
 function SortableCard({ id, name, image, position, checked, isCorrect, isDragActive }: CardProps) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
-    id,
-    disabled: checked,
-  })
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition: isDragging ? undefined : transition,
-  }
-
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id, disabled: checked })
+  const style = { transform: CSS.Transform.toString(transform), transition: isDragging ? undefined : transition }
   return (
     <div
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-      {...listeners}
-      aria-label={name}
-      className={[
-        'flex items-center gap-3 rounded-2xl border bg-white px-4 py-3 shadow-sm',
-        'select-none outline-none touch-none',
+      ref={setNodeRef} style={style} {...attributes} {...listeners} aria-label={name}
+      className={['flex items-center gap-3 rounded-2xl border bg-white px-4 py-3 shadow-sm', 'select-none outline-none touch-none',
         !checked ? 'cursor-grab active:cursor-grabbing' : 'cursor-default',
-        isDragging
-          ? 'opacity-30'
-          : isDragActive
-          ? 'border-primary-200'
-          : 'border-gray-200',
+        isDragging ? 'opacity-30' : isDragActive ? 'border-primary-200' : 'border-gray-200',
         checked && isCorrect ? 'border-green-400 bg-green-50' : '',
         checked && !isCorrect ? 'border-red-300 bg-red-50' : '',
-      ]
-        .filter(Boolean)
-        .join(' ')}
+      ].filter(Boolean).join(' ')}
     >
-      <span className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-500 flex-shrink-0">
-        {position + 1}
-      </span>
+      <span className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-500 flex-shrink-0">{position + 1}</span>
       <img src={image} alt={name} className="w-10 h-10 object-contain rounded-lg flex-shrink-0" />
       <span className="flex-1 font-medium text-gray-900 text-sm leading-tight">{name}</span>
       {checked ? (
-        <span className={`text-base font-bold flex-shrink-0 ${isCorrect ? 'text-green-500' : 'text-red-400'}`}>
-          {isCorrect ? '✓' : '✗'}
-        </span>
+        <span className={`text-base font-bold flex-shrink-0 ${isCorrect ? 'text-green-500' : 'text-red-400'}`}>{isCorrect ? '✓' : '✗'}</span>
       ) : (
-        <svg
-          className="w-5 h-5 text-gray-300 flex-shrink-0"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-          aria-hidden="true"
-        >
-          <circle cx="7" cy="5" r="1.5" />
-          <circle cx="7" cy="10" r="1.5" />
-          <circle cx="7" cy="15" r="1.5" />
-          <circle cx="13" cy="5" r="1.5" />
-          <circle cx="13" cy="10" r="1.5" />
-          <circle cx="13" cy="15" r="1.5" />
+        <svg className="w-5 h-5 text-gray-300 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+          <circle cx="7" cy="5" r="1.5" /><circle cx="7" cy="10" r="1.5" /><circle cx="7" cy="15" r="1.5" />
+          <circle cx="13" cy="5" r="1.5" /><circle cx="13" cy="10" r="1.5" /><circle cx="13" cy="15" r="1.5" />
         </svg>
       )}
     </div>
@@ -106,10 +57,27 @@ function SortableCard({ id, name, image, position, checked, isCorrect, isDragAct
 }
 
 export function OrderGame() {
+  const { lang } = useLang()
+  const gameMovements = (lang === 'ru' ? movementsRu : movements).filter((m) => m.id !== 6)
+  const correctOrder = gameMovements.map((m) => m.id)
+
   const [items, setItems] = useState<number[]>(() => shuffle(correctOrder))
   const [checked, setChecked] = useState(false)
   const [isDragActive, setIsDragActive] = useState(false)
   const [activeId, setActiveId] = useState<number | null>(null)
+
+  const t = {
+    back: lang === 'ru' ? '← Главная' : '← Басты бет',
+    title: lang === 'ru' ? 'Игра — Порядок движений' : 'Ойын — Қимылдар реті',
+    subtitle: lang === 'ru' ? `Расставь ${gameMovements.length} движений намаза в правильном порядке. Перетащи карточки.` : `Намаздың ${gameMovements.length} қимылын дұрыс ретке келтір. Карточкаларды сүйреп орналастыр.`,
+    check: lang === 'ru' ? 'Проверить' : 'Тексеру',
+    allCorrect: lang === 'ru' ? 'МашаАллах! Всё правильно!' : 'МашаАллаh! Барлық қимылды дұрыс реттедің!',
+    good: lang === 'ru' ? 'Хороший результат! Повтори до 100%.' : 'Жақсы нәтиже! Қайта байқап 100% жеткіз.',
+    tryAgain: lang === 'ru' ? 'Попробуй ещё раз — перечитай движения.' : 'Қайталап байқа — намаз қимылдарын оқып шық.',
+    correct: (c: number, t: number) => lang === 'ru' ? `${c} / ${t} правильно` : `${c} / ${t} дұрыс`,
+    replay: lang === 'ru' ? 'Играть снова' : 'Қайтадан ойнау',
+    movements: lang === 'ru' ? 'Читать движения →' : 'Қимылдарды оқу →',
+  }
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
@@ -117,90 +85,52 @@ export function OrderGame() {
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   )
 
-  function handleDragStart(event: DragStartEvent) {
-    setIsDragActive(true)
-    setActiveId(event.active.id as number)
-  }
-
+  function handleDragStart(event: DragStartEvent) { setIsDragActive(true); setActiveId(event.active.id as number) }
   function handleDragEnd(event: DragEndEvent) {
-    setIsDragActive(false)
-    setActiveId(null)
+    setIsDragActive(false); setActiveId(null)
     const { active, over } = event
     if (over && active.id !== over.id) {
-      setItems((prev) => {
-        const from = prev.indexOf(active.id as number)
-        const to = prev.indexOf(over.id as number)
-        return arrayMove(prev, from, to)
-      })
+      setItems((prev) => { const from = prev.indexOf(active.id as number); const to = prev.indexOf(over.id as number); return arrayMove(prev, from, to) })
     }
   }
-
-  function handleDragCancel() {
-    setIsDragActive(false)
-    setActiveId(null)
-  }
+  function handleDragCancel() { setIsDragActive(false); setActiveId(null) }
+  function handleRestart() { setItems(shuffle(correctOrder)); setChecked(false) }
 
   const correctCount = items.filter((id, i) => id === correctOrder[i]).length
   const allCorrect = correctCount === correctOrder.length
   const activeMovement = activeId ? gameMovements.find((m) => m.id === activeId) : null
 
-  function handleRestart() {
-    setItems(shuffle(correctOrder))
-    setChecked(false)
+  function getResultMsg() {
+    if (allCorrect) return t.allCorrect
+    if (correctCount >= 5) return t.good
+    return t.tryAgain
   }
 
   return (
     <main translate="no" className="max-w-xl mx-auto px-4 py-8">
       <div className="mb-6">
-        <Link to="/" className="text-sm text-primary-600 hover:underline">
-          ← Басты бет
-        </Link>
-        <h1 className="text-2xl md:text-3xl font-bold text-primary-900 mt-2">
-          Ойын — Қимылдар реті
-        </h1>
-        <p className="text-gray-500 mt-1 text-sm">
-          Намаздың {gameMovements.length} қимылын дұрыс ретке келтір. Карточкаларды сүйреп орналастыр.
-        </p>
+        <Link to="/" className="text-sm text-primary-600 hover:underline">{t.back}</Link>
+        <h1 className="text-2xl md:text-3xl font-bold text-primary-900 mt-2">{t.title}</h1>
+        <p className="text-gray-500 mt-1 text-sm">{t.subtitle}</p>
       </div>
 
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragStart={handleDragStart}
-        onDragEnd={handleDragEnd}
-        onDragCancel={handleDragCancel}
-      >
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd} onDragCancel={handleDragCancel}>
         <SortableContext items={items} strategy={verticalListSortingStrategy}>
           <div className="flex flex-col gap-2">
             {items.map((id, index) => {
               const movement = gameMovements.find((m) => m.id === id)!
               return (
-                <SortableCard
-                  key={id}
-                  id={id}
-                  name={movement.name}
-                  image={movement.image}
-                  position={index}
-                  checked={checked}
-                  isCorrect={id === correctOrder[index]}
-                  isDragActive={isDragActive}
-                />
+                <SortableCard key={id} id={id} name={movement.name} image={movement.image} position={index}
+                  checked={checked} isCorrect={id === correctOrder[index]} isDragActive={isDragActive} />
               )
             })}
           </div>
         </SortableContext>
-
         <DragOverlay dropAnimation={null}>
           {activeMovement ? (
             <div className="flex items-center gap-3 rounded-2xl border-2 border-primary-400 bg-white px-4 py-3 shadow-2xl">
-              <img
-                src={activeMovement.image}
-                alt={activeMovement.name}
-                className="w-10 h-10 object-contain rounded-lg flex-shrink-0"
-              />
-              <span className="flex-1 font-medium text-gray-900 text-sm leading-tight">
-                {activeMovement.name}
-              </span>
+              <img src={activeMovement.image} alt={activeMovement.name} className="w-10 h-10 object-contain rounded-lg flex-shrink-0" />
+              <span className="flex-1 font-medium text-gray-900 text-sm leading-tight">{activeMovement.name}</span>
             </div>
           ) : null}
         </DragOverlay>
@@ -208,31 +138,15 @@ export function OrderGame() {
 
       <div className="mt-6">
         {!checked ? (
-          <button onClick={() => setChecked(true)} className="btn-primary w-full">
-            Тексеру
-          </button>
+          <button onClick={() => setChecked(true)} className="btn-primary w-full">{t.check}</button>
         ) : (
           <div className="card text-center py-6">
-            <p className="text-4xl mb-3">
-              {allCorrect ? '🎉' : correctCount >= 5 ? '👍' : '💪'}
-            </p>
-            <p className="text-xl font-bold text-gray-900 mb-1">
-              {correctCount} / {correctOrder.length} дұрыс
-            </p>
-            <p className="text-gray-600 text-sm mb-5">
-              {allCorrect
-                ? 'МашаАллаh! Барлық қимылды дұрыс реттедің!'
-                : correctCount >= 5
-                ? 'Жақсы нәтиже! Қайта байқап 100% жеткіз.'
-                : 'Қайталап байқа — намаз қимылдарын оқып шық.'}
-            </p>
+            <p className="text-4xl mb-3">{allCorrect ? '🎉' : correctCount >= 5 ? '👍' : '💪'}</p>
+            <p className="text-xl font-bold text-gray-900 mb-1">{t.correct(correctCount, correctOrder.length)}</p>
+            <p className="text-gray-600 text-sm mb-5">{getResultMsg()}</p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <button onClick={handleRestart} className="btn-primary">
-                Қайтадан ойнау
-              </button>
-              <Link to="/movements" className="btn-secondary">
-                Қимылдарды оқу →
-              </Link>
+              <button onClick={handleRestart} className="btn-primary">{t.replay}</button>
+              <Link to="/movements" className="btn-secondary">{t.movements}</Link>
             </div>
           </div>
         )}

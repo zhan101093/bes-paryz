@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useLang } from '../contexts/LanguageContext'
 import { Link } from 'react-router-dom'
 
 const scenarios = [
@@ -41,6 +42,7 @@ const scenarios = [
 ]
 
 export function KazhylykScenarioGame() {
+  const { lang } = useLang()
   const [currentIdx, setCurrentIdx] = useState(0)
   const [hearts, setHearts] = useState(0)
   const [score, setScore] = useState(0)
@@ -88,7 +90,7 @@ export function KazhylykScenarioGame() {
         <div className="max-w-md w-full">
           <div className="bg-white rounded-3xl shadow-xl border border-amber-200 px-6 py-8 text-center">
             <div className="text-5xl mb-3">{allCorrect ? '🏆' : '🌱'}</div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-1">НӘТИЖЕ</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-1">{lang === 'ru' ? 'РЕЗУЛЬТАТ' : 'НӘТИЖЕ'}</h2>
             <p className="text-5xl font-bold text-amber-600 mb-1">{score} балл</p>
 
             {/* Heart meter */}
@@ -144,13 +146,13 @@ export function KazhylykScenarioGame() {
                 onClick={restart}
                 className="w-full bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold py-3 rounded-2xl shadow hover:shadow-lg transition-all hover:scale-105"
               >
-                🔁 ҚАЙТА ОЙНАУ
+                {lang === 'ru' ? '🔁 ИГРАТЬ СНОВА' : '🔁 ҚАЙТА ОЙНАУ'}
               </button>
               <Link
                 to="/kazhylyk"
                 className="w-full block bg-gray-50 border border-gray-200 text-gray-600 font-semibold py-3 rounded-2xl text-center hover:bg-gray-100 transition-colors"
               >
-                🏠 БАСТЫ БЕТКЕ
+                {lang === 'ru' ? '🏠 НА ГЛАВНУЮ' : '🏠 БАСТЫ БЕТКЕ'}
               </Link>
             </div>
           </div>
@@ -167,7 +169,7 @@ export function KazhylykScenarioGame() {
             to="/kazhylyk"
             className="text-sm text-amber-700 hover:text-amber-900 transition-colors"
           >
-            ← Қажылық
+            {lang === 'ru' ? '← Хадж' : '← Қажылық'}
           </Link>
           <span className="text-sm text-gray-500 font-medium">
             {currentIdx + 1}/{scenarios.length}
@@ -175,8 +177,8 @@ export function KazhylykScenarioGame() {
         </div>
 
         <div className="bg-white rounded-2xl px-5 py-4 shadow border border-amber-100 mb-4 text-center">
-          <h1 className="text-xl font-bold text-gray-900 mb-1">🎭 Қажылық роль-play</h1>
-          <p className="text-sm text-gray-500">Ситуацияда дұрыс шешім қабылда</p>
+          <h1 className="text-xl font-bold text-gray-900 mb-1">{lang === 'ru' ? '🎭 Хадж роль-плей' : '🎭 Қажылық роль-play'}</h1>
+          <p className="text-sm text-gray-500">{lang === 'ru' ? 'Принимай правильные решения в ситуациях' : 'Ситуацияда дұрыс шешім қабылда'}</p>
         </div>
 
         <div className="h-2.5 bg-gray-200 rounded-full overflow-hidden mb-3">
@@ -198,7 +200,7 @@ export function KazhylykScenarioGame() {
               ❤️
             </span>
           ))}
-          <span className="ml-2 text-xs text-gray-400 font-medium">Жүректің тазалығы</span>
+          <span className="ml-2 text-xs text-gray-400 font-medium">{lang === 'ru' ? 'Чистота сердца' : 'Жүректің тазалығы'}</span>
         </div>
 
         {/* Scenario card */}
@@ -260,7 +262,7 @@ export function KazhylykScenarioGame() {
                     : 'text-red-700'
                 }`}
               >
-                {scenario.options[selectedOption].correct ? '🌟 ДҰРЫС!' : '❌ ҚАТЕ'}
+                {scenario.options[selectedOption].correct ? '🌟 ' + (lang === 'ru' ? 'ВЕРНО!' : 'ДҰРЫС!') : '❌ ' + (lang === 'ru' ? 'НЕВЕРНО' : 'ҚАТЕ')}
               </p>
               <p className="text-gray-600 text-xs">{scenario.feedback}</p>
             </div>
