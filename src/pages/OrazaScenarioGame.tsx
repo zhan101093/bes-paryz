@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useLang } from '../contexts/LanguageContext'
 
-const scenarios = [
+const scenariosKk = [
   {
     id: 1,
     icon: '💧',
@@ -76,7 +77,78 @@ const scenarios = [
   },
 ]
 
+const scenariosRu = [
+  {
+    id: 1, icon: '💧',
+    setup: 'Ты за границей. Месяц Рамадан. После работы очень устала и хочешь пить. Коллеги позвали выпить воды. Ты держишь пост.',
+    options: [
+      { text: 'Выпью немного, чтобы не обидеть', correct: false },
+      { text: 'Держу пост — терплю, прошу помощи у Аллаха', correct: true },
+      { text: 'Нарушу пост — устала', correct: false },
+      { text: 'Прекращу разговор', correct: false },
+    ],
+    feedback: 'Терпеть жажду — это суть поста. Аллах любит терпеливых.',
+  },
+  {
+    id: 2, icon: '😮',
+    setup: 'Идёшь по улице и случайно проглотила воду. Тут же вспомнила, что держишь пост.',
+    options: [
+      { text: 'Раз нарушила — буду есть', correct: false },
+      { text: 'Немедленно останавливаюсь и продолжаю пост', correct: true },
+      { text: 'Испугалась, молюсь', correct: false },
+      { text: 'Виню себя', correct: false },
+    ],
+    feedback: 'Случайное проглатывание не нарушает пост! Когда вспомнишь — остановись и продолжай.',
+  },
+  {
+    id: 3, icon: '🗣️',
+    setup: 'Друзья начали сплетничать. Тебе тоже хочется что-то сказать, но ты держишь пост.',
+    options: [
+      { text: 'Разговариваю с ними', correct: false },
+      { text: 'Стараюсь остановить их или ухожу', correct: true },
+      { text: 'Молча слушаю', correct: false },
+      { text: 'Смеюсь', correct: false },
+    ],
+    feedback: 'Пост очищает и язык. Держаться подальше от сплетен — значит хранить дух поста.',
+  },
+  {
+    id: 4, icon: '🦷',
+    setup: 'Сильно болит зуб, а до ифтара ещё далеко.',
+    options: [
+      { text: 'Терплю и никому не говорю', correct: false },
+      { text: 'Иду к стоматологу, остерегаясь проглотить воду', correct: true },
+      { text: 'Нарушаю пост и принимаю лекарство', correct: false },
+      { text: 'Жду врача', correct: false },
+    ],
+    feedback: 'В экстренной ситуации поход к врачу разрешён. Достаточно держаться от воды во время лечения.',
+  },
+  {
+    id: 5, icon: '😴',
+    setup: 'Проснулась во сне и случайно выпила воды — потом вспомнила, что держишь пост.',
+    options: [
+      { text: 'Буду есть — всё равно нарушила', correct: false },
+      { text: 'Закрываю рот и продолжаю пост', correct: true },
+      { text: 'Молюсь', correct: false },
+      { text: 'Играю', correct: false },
+    ],
+    feedback: 'Случайное питьё не нарушает пост — это дар Аллаха. Нужно продолжать!',
+  },
+  {
+    id: 6, icon: '🕌',
+    setup: 'В Рамадан хочешь сходить на Таравих, но много работы.',
+    options: [
+      { text: 'Закончу работу и дома прочитаю намаз', correct: false },
+      { text: 'Брошу работу и пойду в мечеть', correct: false },
+      { text: 'Закончу работу — успею в мечеть, нет — дома прочитаю', correct: true },
+      { text: 'Поиграю', correct: false },
+    ],
+    feedback: 'Выполнить обязанность по работе и, если получится, пойти в мечеть — лучшее решение. Намаз минимум дома надо прочитать.',
+  },
+]
+
 export function OrazaScenarioGame() {
+  const { lang } = useLang()
+  const scenarios = lang === 'ru' ? scenariosRu : scenariosKk
   const [currentIdx, setCurrentIdx] = useState(0)
   const [sabr, setSabr] = useState(0)
   const [score, setScore] = useState(0)
@@ -86,6 +158,20 @@ export function OrazaScenarioGame() {
 
   const scenario = scenarios[currentIdx]
   const totalSabr = scenarios.length
+
+  const ui = {
+    back: lang === 'ru' ? '← Пост' : '← Ораза',
+    title: lang === 'ru' ? '🎭 Ситуации во время поста' : '🎭 Оразадағы ситуациялар',
+    subtitle: lang === 'ru' ? 'Принимай правильные решения' : 'Ситуацияда дұрыс шешім қабылда',
+    sabrMeter: lang === 'ru' ? 'Шкала терпения' : 'Сабыр өлшегіші',
+    result: lang === 'ru' ? 'РЕЗУЛЬТАТ' : 'НӘТИЖЕ',
+    correct: (c: number, t: number) => lang === 'ru' ? `${c}/${t} правильно` : `${c}/${t} дұрыс`,
+    congrats: lang === 'ru' ? '✨ Духовная чистота достигнута!' : '✨ Рухани тазалық жетті!',
+    replay: lang === 'ru' ? '🔁 ИГРАТЬ СНОВА' : '🔁 ҚАЙТА ОЙНАУ',
+    home: lang === 'ru' ? '🏠 НА ГЛАВНУЮ' : '🏠 БАСТЫ БЕТКЕ',
+    right: lang === 'ru' ? '🌟 ВЕРНО!' : '🌟 ДҰРЫС!',
+    wrong: lang === 'ru' ? '❌ НЕВЕРНО' : '❌ ҚАТЕ',
+  }
 
   function handleSelect(optionIdx: number) {
     if (selectedOption !== null) return
@@ -125,8 +211,8 @@ export function OrazaScenarioGame() {
         <div className="max-w-md w-full">
           <div className="bg-white rounded-3xl shadow-xl border border-violet-200 px-6 py-8 text-center">
             <div className="text-5xl mb-3">{allCorrect ? '🏆' : '🌙'}</div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-1">НӘТИЖЕ</h2>
-            <p className="text-5xl font-bold text-violet-600 mb-1">{score} балл</p>
+            <h2 className="text-2xl font-bold text-gray-900 mb-1">{ui.result}</h2>
+            <p className="text-5xl font-bold text-violet-600 mb-1">{score}</p>
 
             {/* Sabr meter */}
             <div className="flex justify-center gap-1 my-4">
@@ -139,16 +225,14 @@ export function OrazaScenarioGame() {
                 </span>
               ))}
             </div>
-            <p className="text-xs text-gray-400 mb-4">Сабыр өлшегіші</p>
+            <p className="text-xs text-gray-400 mb-4">{ui.sabrMeter}</p>
 
             {allCorrect ? (
               <div className="bg-violet-50 border border-violet-200 rounded-2xl px-4 py-3 mb-6">
-                <p className="text-violet-800 font-bold">✨ Рухани тазалық жетті!</p>
+                <p className="text-violet-800 font-bold">{ui.congrats}</p>
               </div>
             ) : (
-              <p className="text-gray-400 text-sm mb-6">
-                {correctCount}/{scenarios.length} дұрыс
-              </p>
+              <p className="text-gray-400 text-sm mb-6">{ui.correct(correctCount, scenarios.length)}</p>
             )}
 
             <div className="space-y-3 mb-6 text-left">
@@ -186,13 +270,13 @@ export function OrazaScenarioGame() {
                 onClick={restart}
                 className="w-full bg-gradient-to-r from-violet-500 to-purple-600 text-white font-bold py-3 rounded-2xl shadow hover:shadow-lg transition-all hover:scale-105"
               >
-                🔁 ҚАЙТА ОЙНАУ
+                {ui.replay}
               </button>
               <Link
                 to="/oraza"
                 className="w-full block bg-gray-50 border border-gray-200 text-gray-600 font-semibold py-3 rounded-2xl text-center hover:bg-gray-100 transition-colors"
               >
-                🏠 БАСТЫ БЕТКЕ
+                {ui.home}
               </Link>
             </div>
           </div>
@@ -206,7 +290,7 @@ export function OrazaScenarioGame() {
       <div className="max-w-lg mx-auto">
         <div className="flex items-center justify-between mb-4">
           <Link to="/oraza" className="text-sm text-violet-700 hover:text-violet-900 transition-colors">
-            ← Ораза
+            {ui.back}
           </Link>
           <span className="text-sm text-gray-500 font-medium">
             {currentIdx + 1}/{scenarios.length}
@@ -214,8 +298,8 @@ export function OrazaScenarioGame() {
         </div>
 
         <div className="bg-white rounded-2xl px-5 py-4 shadow border border-violet-100 mb-4 text-center">
-          <h1 className="text-xl font-bold text-gray-900 mb-1">🎭 Оразадағы ситуациялар</h1>
-          <p className="text-sm text-gray-500">Ситуацияда дұрыс шешім қабылда</p>
+          <h1 className="text-xl font-bold text-gray-900 mb-1">{ui.title}</h1>
+          <p className="text-sm text-gray-500">{ui.subtitle}</p>
         </div>
 
         <div className="h-2.5 bg-gray-200 rounded-full overflow-hidden mb-3">
@@ -237,7 +321,7 @@ export function OrazaScenarioGame() {
               🤍
             </span>
           ))}
-          <span className="ml-2 text-xs text-gray-400 font-medium">Сабыр өлшегіші</span>
+          <span className="ml-2 text-xs text-gray-400 font-medium">{ui.sabrMeter}</span>
         </div>
 
         {/* Scenario card */}
@@ -297,7 +381,7 @@ export function OrazaScenarioGame() {
                     : 'text-red-700'
                 }`}
               >
-                {scenario.options[selectedOption].correct ? '🌟 ДҰРЫС!' : '❌ ҚАТЕ'}
+                {scenario.options[selectedOption].correct ? ui.right : ui.wrong}
               </p>
               <p className="text-gray-600 text-xs">{scenario.feedback}</p>
             </div>
