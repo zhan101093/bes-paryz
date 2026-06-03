@@ -69,8 +69,25 @@ export function Home() {
         <p className="text-primary-400 text-xs mt-3">{t.hadithSource}</p>
       </div>
 
-      <div className="mb-8 rounded-2xl overflow-hidden shadow-lg">
+      <div className="mb-8 rounded-2xl overflow-hidden shadow-lg relative">
         <img src="/images/basty-bet.jpg" alt="Бес парыз" className="w-full object-cover" loading="lazy" />
+        {lang === 'ru' && (
+          <div
+            className="absolute inset-x-0 flex items-center justify-center px-6"
+            style={{
+              top: '4.5%',
+              height: '13%',
+              background: 'linear-gradient(to bottom, rgba(208,180,135,0.97) 0%, rgba(195,165,115,0.95) 100%)',
+            }}
+          >
+            <p
+              className="text-center text-stone-800 font-semibold tracking-wide text-xs sm:text-sm md:text-base lg:text-lg"
+              style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
+            >
+              Ислам воздвигнут на пяти основах
+            </p>
+          </div>
+        )}
       </div>
 
       <h2 className="text-center text-gray-500 text-sm font-medium mb-5">{t.chooseText}</h2>
