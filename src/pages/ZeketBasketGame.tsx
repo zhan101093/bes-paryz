@@ -189,7 +189,6 @@ function shuffle<T>(arr: T[]): T[] {
 
 export function ZeketBasketGame() {
   const { lang } = useLang()
-  const cards = lang === 'ru' ? cardsRu : cardsKk
   const TYPE_LABEL = lang === 'ru' ? TYPE_LABEL_RU : TYPE_LABEL_KK
   const [shuffledCards] = useState(() => shuffle(lang === 'ru' ? cardsRu : cardsKk))
   const [currentIdx, setCurrentIdx] = useState(0)
