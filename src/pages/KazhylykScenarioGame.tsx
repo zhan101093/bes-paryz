@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useLang } from '../contexts/LanguageContext'
 import { Link } from 'react-router-dom'
 
-const scenarios = [
+const scenariosKk = [
   {
     id: 1,
     icon: '🤍',
@@ -41,8 +41,49 @@ const scenarios = [
   },
 ]
 
+const scenariosRu = [
+  {
+    id: 1,
+    icon: '🤍',
+    setup: 'Ты в ихраме. Кто-то тебя разозлил.',
+    options: [
+      { text: 'Поругаюсь с ним', correct: false },
+      { text: 'Проявлю терпение и вспомню Аллаха', correct: true },
+      { text: 'Уйду обратно', correct: false },
+      { text: 'Посмеюсь', correct: false },
+    ],
+    feedback: 'В ихраме нужно избегать ссор и гнева. Терпение — основа ихрама.',
+  },
+  {
+    id: 2,
+    icon: '🕋',
+    setup: 'Ты совершаешь таваф и устал.',
+    options: [
+      { text: 'Остановлюсь', correct: false },
+      { text: 'Продолжу и буду читать дуа', correct: true },
+      { text: 'Лягу спать', correct: false },
+      { text: 'Буду смотреть в телефон', correct: false },
+    ],
+    feedback: 'Даже если устал в тавафе — продолжать и читать дуа — это суть поклонения.',
+  },
+  {
+    id: 3,
+    icon: '⛰️',
+    setup: 'Что ты делаешь в день Арафата?',
+    options: [
+      { text: 'Много разговариваю', correct: false },
+      { text: 'Читаю дуа и прошу прощения', correct: true },
+      { text: 'Играю в игры', correct: false },
+      { text: 'Торгую', correct: false },
+    ],
+    feedback: 'День Арафата — день прощения. Главное: читать дуа, просить прощения.',
+  },
+]
+
 export function KazhylykScenarioGame() {
   const { lang } = useLang()
+  const scenarios = lang === 'ru' ? scenariosRu : scenariosKk
+
   const [currentIdx, setCurrentIdx] = useState(0)
   const [hearts, setHearts] = useState(0)
   const [score, setScore] = useState(0)
@@ -83,6 +124,21 @@ export function KazhylykScenarioGame() {
     setGameState('playing')
   }
 
+  const t = {
+    back: lang === 'ru' ? '← Хадж' : '← Қажылық',
+    title: lang === 'ru' ? '🎭 Хадж роль-плей' : '🎭 Қажылық роль-play',
+    subtitle: lang === 'ru' ? 'Принимай правильные решения в ситуациях' : 'Ситуацияда дұрыс шешім қабылда',
+    heartLabel: lang === 'ru' ? 'Чистота сердца' : 'Жүректің тазалығы',
+    resultTitle: lang === 'ru' ? 'РЕЗУЛЬТАТ' : 'НӘТИЖЕ',
+    scoreLabel: lang === 'ru' ? 'балл' : 'балл',
+    allCorrectMsg: lang === 'ru' ? '🏅 Дух хаджа принят!' : '🏅 Қажылық рухы қабыл болды!',
+    correctOf: (n: number, t: number) => lang === 'ru' ? `${n}/${t} верно` : `${n}/${t} дұрыс`,
+    replay: lang === 'ru' ? '🔁 ИГРАТЬ СНОВА' : '🔁 ҚАЙТА ОЙНАУ',
+    home: lang === 'ru' ? '🏠 НА ГЛАВНУЮ' : '🏠 БАСТЫ БЕТКЕ',
+    correct: lang === 'ru' ? '🌟 ВЕРНО!' : '🌟 ДҰРЫС!',
+    wrong: lang === 'ru' ? '❌ НЕВЕРНО' : '❌ ҚАТЕ',
+  }
+
   if (gameState === 'result') {
     const allCorrect = results.every(Boolean)
     return (
@@ -90,29 +146,21 @@ export function KazhylykScenarioGame() {
         <div className="max-w-md w-full">
           <div className="bg-white rounded-3xl shadow-xl border border-amber-200 px-6 py-8 text-center">
             <div className="text-5xl mb-3">{allCorrect ? '🏆' : '🌱'}</div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-1">{lang === 'ru' ? 'РЕЗУЛЬТАТ' : 'НӘТИЖЕ'}</h2>
-            <p className="text-5xl font-bold text-amber-600 mb-1">{score} балл</p>
+            <h2 className="text-2xl font-bold text-gray-900 mb-1">{t.resultTitle}</h2>
+            <p className="text-5xl font-bold text-amber-600 mb-1">{score} {t.scoreLabel}</p>
 
-            {/* Heart meter */}
             <div className="flex justify-center gap-1 my-4">
               {Array.from({ length: totalHearts }).map((_, i) => (
-                <span
-                  key={i}
-                  className={`text-2xl transition-all ${i < hearts ? 'opacity-100' : 'opacity-20'}`}
-                >
-                  ❤️
-                </span>
+                <span key={i} className={`text-2xl transition-all ${i < hearts ? 'opacity-100' : 'opacity-20'}`}>❤️</span>
               ))}
             </div>
 
             {allCorrect ? (
               <div className="bg-amber-50 border border-amber-200 rounded-2xl px-4 py-3 mb-6">
-                <p className="text-amber-800 font-bold">🏅 Қажылық рухы қабыл болды!</p>
+                <p className="text-amber-800 font-bold">{t.allCorrectMsg}</p>
               </div>
             ) : (
-              <p className="text-gray-400 text-sm mb-6">
-                {results.filter(Boolean).length}/{scenarios.length} дұрыс
-              </p>
+              <p className="text-gray-400 text-sm mb-6">{t.correctOf(results.filter(Boolean).length, scenarios.length)}</p>
             )}
 
             <div className="space-y-3 mb-6 text-left">
@@ -120,39 +168,24 @@ export function KazhylykScenarioGame() {
                 const ok = results[i] ?? false
                 const correctOption = s.options.find((o) => o.correct)
                 return (
-                  <div
-                    key={s.id}
-                    className={`rounded-xl p-3 border text-sm ${
-                      ok ? 'bg-teal-50 border-teal-200' : 'bg-red-50 border-red-200'
-                    }`}
-                  >
+                  <div key={s.id} className={`rounded-xl p-3 border text-sm ${ok ? 'bg-teal-50 border-teal-200' : 'bg-red-50 border-red-200'}`}>
                     <div className="flex items-center gap-2 mb-1">
                       <span className="text-lg">{s.icon}</span>
                       <p className="font-medium text-gray-800 text-xs">{s.setup}</p>
                     </div>
-                    <p className={`text-xs font-medium ${ok ? 'text-teal-600' : 'text-red-500'}`}>
-                      ✅ {correctOption?.text}
-                    </p>
-                    {!ok && (
-                      <p className="text-xs text-gray-400 mt-0.5">{s.feedback}</p>
-                    )}
+                    <p className={`text-xs font-medium ${ok ? 'text-teal-600' : 'text-red-500'}`}>✅ {correctOption?.text}</p>
+                    {!ok && <p className="text-xs text-gray-400 mt-0.5">{s.feedback}</p>}
                   </div>
                 )
               })}
             </div>
 
             <div className="flex flex-col gap-3">
-              <button
-                onClick={restart}
-                className="w-full bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold py-3 rounded-2xl shadow hover:shadow-lg transition-all hover:scale-105"
-              >
-                {lang === 'ru' ? '🔁 ИГРАТЬ СНОВА' : '🔁 ҚАЙТА ОЙНАУ'}
+              <button onClick={restart} className="w-full bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold py-3 rounded-2xl shadow hover:shadow-lg transition-all hover:scale-105">
+                {t.replay}
               </button>
-              <Link
-                to="/kazhylyk"
-                className="w-full block bg-gray-50 border border-gray-200 text-gray-600 font-semibold py-3 rounded-2xl text-center hover:bg-gray-100 transition-colors"
-              >
-                {lang === 'ru' ? '🏠 НА ГЛАВНУЮ' : '🏠 БАСТЫ БЕТКЕ'}
+              <Link to="/kazhylyk" className="w-full block bg-gray-50 border border-gray-200 text-gray-600 font-semibold py-3 rounded-2xl text-center hover:bg-gray-100 transition-colors">
+                {t.home}
               </Link>
             </div>
           </div>
@@ -165,104 +198,58 @@ export function KazhylykScenarioGame() {
     <main translate="no" className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 px-4 py-6">
       <div className="max-w-lg mx-auto">
         <div className="flex items-center justify-between mb-4">
-          <Link
-            to="/kazhylyk"
-            className="text-sm text-amber-700 hover:text-amber-900 transition-colors"
-          >
-            {lang === 'ru' ? '← Хадж' : '← Қажылық'}
-          </Link>
-          <span className="text-sm text-gray-500 font-medium">
-            {currentIdx + 1}/{scenarios.length}
-          </span>
+          <Link to="/kazhylyk" className="text-sm text-amber-700 hover:text-amber-900 transition-colors">{t.back}</Link>
+          <span className="text-sm text-gray-500 font-medium">{currentIdx + 1}/{scenarios.length}</span>
         </div>
 
         <div className="bg-white rounded-2xl px-5 py-4 shadow border border-amber-100 mb-4 text-center">
-          <h1 className="text-xl font-bold text-gray-900 mb-1">{lang === 'ru' ? '🎭 Хадж роль-плей' : '🎭 Қажылық роль-play'}</h1>
-          <p className="text-sm text-gray-500">{lang === 'ru' ? 'Принимай правильные решения в ситуациях' : 'Ситуацияда дұрыс шешім қабылда'}</p>
+          <h1 className="text-xl font-bold text-gray-900 mb-1">{t.title}</h1>
+          <p className="text-sm text-gray-500">{t.subtitle}</p>
         </div>
 
         <div className="h-2.5 bg-gray-200 rounded-full overflow-hidden mb-3">
-          <div
-            className="h-full bg-gradient-to-r from-amber-400 to-orange-500 rounded-full transition-all duration-500"
-            style={{ width: `${(currentIdx / scenarios.length) * 100}%` }}
-          />
+          <div className="h-full bg-gradient-to-r from-amber-400 to-orange-500 rounded-full transition-all duration-500" style={{ width: `${(currentIdx / scenarios.length) * 100}%` }} />
         </div>
 
-        {/* Heart meter */}
         <div className="flex items-center justify-center gap-1 mb-5">
           {Array.from({ length: totalHearts }).map((_, i) => (
-            <span
-              key={i}
-              className={`text-2xl transition-all duration-300 ${
-                i < hearts ? 'opacity-100 scale-110' : 'opacity-20'
-              }`}
-            >
-              ❤️
-            </span>
+            <span key={i} className={`text-2xl transition-all duration-300 ${i < hearts ? 'opacity-100 scale-110' : 'opacity-20'}`}>❤️</span>
           ))}
-          <span className="ml-2 text-xs text-gray-400 font-medium">{lang === 'ru' ? 'Чистота сердца' : 'Жүректің тазалығы'}</span>
+          <span className="ml-2 text-xs text-gray-400 font-medium">{t.heartLabel}</span>
         </div>
 
-        {/* Scenario card */}
         <div className="bg-white rounded-3xl shadow-lg border-2 border-amber-200 px-6 py-6 mb-4">
           <div className="text-5xl text-center mb-4">{scenario.icon}</div>
-          <p className="text-base font-bold text-gray-900 mb-6 leading-relaxed text-center">
-            {scenario.setup}
-          </p>
+          <p className="text-base font-bold text-gray-900 mb-6 leading-relaxed text-center">{scenario.setup}</p>
 
           <div className="flex flex-col gap-2">
             {scenario.options.map((option, idx) => {
               const isSelected = selectedOption === idx
               const showResult = selectedOption !== null
 
-              let btnClass =
-                'bg-white border-2 border-amber-200 text-gray-800 hover:border-amber-400 hover:bg-amber-50'
+              let btnClass = 'bg-white border-2 border-amber-200 text-gray-800 hover:border-amber-400 hover:bg-amber-50'
               if (showResult) {
-                if (isSelected && option.correct) {
-                  btnClass = 'bg-teal-50 border-2 border-teal-400 text-teal-800 font-bold'
-                } else if (isSelected && !option.correct) {
-                  btnClass = 'bg-red-50 border-2 border-red-400 text-red-700'
-                } else {
-                  btnClass = 'bg-white border-2 border-gray-200 text-gray-400'
-                }
+                if (isSelected && option.correct) btnClass = 'bg-teal-50 border-2 border-teal-400 text-teal-800 font-bold'
+                else if (isSelected && !option.correct) btnClass = 'bg-red-50 border-2 border-red-400 text-red-700'
+                else btnClass = 'bg-white border-2 border-gray-200 text-gray-400'
               }
 
               return (
-                <button
-                  key={idx}
-                  onClick={() => handleSelect(idx)}
-                  disabled={selectedOption !== null}
-                  className={`${btnClass} rounded-2xl px-4 py-3 text-sm font-semibold text-left transition-all hover:scale-[1.02] active:scale-95`}
-                >
+                <button key={idx} onClick={() => handleSelect(idx)} disabled={selectedOption !== null}
+                  className={`${btnClass} rounded-2xl px-4 py-3 text-sm font-semibold text-left transition-all hover:scale-[1.02] active:scale-95`}>
                   <span className="mr-2 text-gray-400">{String.fromCharCode(65 + idx)})</span>
                   {option.text}
-                  {showResult && isSelected && option.correct && (
-                    <span className="float-right">✅</span>
-                  )}
-                  {showResult && isSelected && !option.correct && (
-                    <span className="float-right">❌</span>
-                  )}
+                  {showResult && isSelected && option.correct && <span className="float-right">✅</span>}
+                  {showResult && isSelected && !option.correct && <span className="float-right">❌</span>}
                 </button>
               )
             })}
           </div>
 
           {selectedOption !== null && (
-            <div
-              className={`mt-4 rounded-2xl px-4 py-3 border text-sm ${
-                scenario.options[selectedOption].correct
-                  ? 'bg-teal-50 border-teal-300'
-                  : 'bg-red-50 border-red-300'
-              }`}
-            >
-              <p
-                className={`font-bold mb-1 ${
-                  scenario.options[selectedOption].correct
-                    ? 'text-teal-800'
-                    : 'text-red-700'
-                }`}
-              >
-                {scenario.options[selectedOption].correct ? '🌟 ' + (lang === 'ru' ? 'ВЕРНО!' : 'ДҰРЫС!') : '❌ ' + (lang === 'ru' ? 'НЕВЕРНО' : 'ҚАТЕ')}
+            <div className={`mt-4 rounded-2xl px-4 py-3 border text-sm ${scenario.options[selectedOption].correct ? 'bg-teal-50 border-teal-300' : 'bg-red-50 border-red-300'}`}>
+              <p className={`font-bold mb-1 ${scenario.options[selectedOption].correct ? 'text-teal-800' : 'text-red-700'}`}>
+                {scenario.options[selectedOption].correct ? t.correct : t.wrong}
               </p>
               <p className="text-gray-600 text-xs">{scenario.feedback}</p>
             </div>
